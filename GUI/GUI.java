@@ -1,4 +1,4 @@
-package GUI;
+package gui;
 
 import java.awt.*;
 import javax.swing.*;
@@ -16,7 +16,7 @@ public class GUI {
 	 * A TEMPORARY main method used to check the UI during construction
 	 * This method will later be removed
 	 */
-	public static void main(String[] args) {
+	public GUI() {		
 		// Create containers to hold the components
 		frame = new JFrame("Project's Title COMP7");
 		
@@ -29,7 +29,7 @@ public class GUI {
 		frame.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
 		
 		// Initialise the Main Menu class
-		MainMenu menu = new MainMenu();
+		MainMenuView menu = new MainMenuView();
 		
 		// Add components to containers
 		frame.add(menu.getJPanel(), BorderLayout.CENTER);
@@ -39,6 +39,10 @@ public class GUI {
 		frame.setVisible(true);
 	}
 
+	public static void main(String[] args) {
+		GUI gui = new GUI();
+	}
+	
 	/**
 	 * This method returns a value for sizeVaraible
 	 * 
