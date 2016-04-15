@@ -11,12 +11,16 @@ public class Quoridor {
 	private AIOpponent[] computerOpponent;
 	private ModelFacade models;
 	private Rules rules;
-	private Controls controls;
 	private int playersTurn;
 	
-	public Quoridor(Controls controls, Rules rules){
-		this.controls = controls;
+	public Quoridor(){
+	}
+	
+	public void addRules(Rules rules){
 		this.rules = rules;
+	}
+	
+	public void beginGame(){
 		initialisePlayers(rules.getPlayerColours());
 		models.getBoard().initialiseBoard();
 		models.setWalls(new Wall[rules.MAX_WALLS*rules.MAX_PLAYERS]);
