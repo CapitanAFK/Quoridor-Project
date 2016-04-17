@@ -1,4 +1,4 @@
-package Gameplay;
+package gameplay;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -15,6 +15,8 @@ public class Controls {
 	public String moveDown = "s";
 	public String horizontalWall = "h";
 	public String verticalWall = "v";
+	public String undo = "z";
+	public String endTurn = "m";
 	
 	public Controls(){
 		setKeys("textFiles/controls/left.txt", "left");
@@ -23,6 +25,8 @@ public class Controls {
 		setKeys("textFiles/controls/down.txt", "down");
 		setKeys("textFiles/controls/hor.txt", "hor");
 		setKeys("textFiles/controls/ver.txt", "ver");
+		setKeys("textFiles/controls/undo.txt", "undo");
+		setKeys("textFiles/controls/endTurn.txt", "endTurn");
 	}
 	
 	public void setKeys(String file, String key){
@@ -50,6 +54,10 @@ public class Controls {
 					horizontalWall = line;
 				} else if(key == "ver"){
 					verticalWall = line;
+				} else if(key == "undo"){
+					undo = line;
+				} else if(key == "endTurn"){
+					endTurn = line;
 				}
 			}
 			
@@ -94,5 +102,12 @@ public class Controls {
 	public String getVerticalWall(){
 		return verticalWall;
 	}
-		
+	
+	public String getUndo(){
+		return undo;
+	}
+	
+	public String getEndTurn(){
+		return endTurn;
+	}
 }

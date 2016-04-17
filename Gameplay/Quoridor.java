@@ -1,10 +1,10 @@
-package Gameplay;
+package gameplay;
 
 import java.awt.Color;
 import java.util.Random;
 
-import Model.*;
-import Model.Board.BoardLocation;
+import model.*;
+import model.Board.BoardLocation;
 
 
 public class Quoridor {
@@ -13,17 +13,40 @@ public class Quoridor {
 	private Rules rules;
 	private int playersTurn;
 	
-	public Quoridor(){
-	}
-	
-	public void addRules(Rules rules){
+	public Quoridor(Rules rules){
 		this.rules = rules;
+		models = new ModelFacade();
 	}
 	
 	public void beginGame(){
-		initialisePlayers(rules.getPlayerColours());
+		initialisePlayers();
+		models.setBoard(new Board());
 		models.getBoard().initialiseBoard();
 		models.setWalls(new Wall[rules.MAX_WALLS*rules.MAX_PLAYERS]);
+		determineWhoStarts();
+	}
+	
+	public Player[] getPlayers(){
+		return models.getPlayers();
+	}
+	
+	public Wall[] getWalls(){
+		return models.getWalls();
+	}
+	
+	public Rules getRules(){
+		return rules;
+	}
+	
+	public int getPlayersTurn(){
+		return playersTurn;
+	}
+	
+	public void endPlayersTurn(){
+		playersTurn++;
+		if (playersTurn > rules.MAX_PLAYERS-1){
+			playersTurn = 0;
+		}
 	}
 	
 	/**
@@ -31,14 +54,15 @@ public class Quoridor {
 	 */
 	public void determineWhoStarts(){
 		Random random = new Random();
-		playersTurn = random.nextInt();
+		playersTurn = random.nextInt(rules.MAX_PLAYERS);
+		System.out.println(playersTurn);
 	}
 	
 	/**
 	 * creates the Player objects in the players array with their specified colours
-	 * @param playerColours - the colours of the Player's Pawn Objects
 	 */
-	public void initialisePlayers(Color[] playerColours){
+	public void initialisePlayers(){
+		String[] playerColours = rules.getPlayerColours();
 		models.setPlayers(new Player[rules.MAX_PLAYERS]);
 		for (int i = 0; i < rules.MAX_PLAYERS; i++) {
 			models.getPlayers()[i] = new Player(rules.MAX_WALLS, playerColours[i]);
@@ -50,21 +74,21 @@ public class Quoridor {
 	 * updates any board locations which may be relevant
 	 * @param player - the integer which refers to which Player is being affected
 	 * @param BoardLocation - the Coordinate location the Player's Pawn to be moved to on the 2-D BoardLocation array
-	 * @throws if Pawn is placed on any type of BoardLocation which isn't an instance of a Square object
 	 */
-	public void movePlayersPawn(Board board, Player player, Coordinate boardCoord) throws Exception{
+	public boolean movePlayersPawn(Coordinate boardCoord){
 		//checks if board location is a square
-		if (board.getBoardLocation(boardCoord) == BoardLocation.FREE_SQUARE){
+		if (models.getBoard().getBoardLocation(boardCoord) == BoardLocation.FREE_SQUARE){
 			//checks if players pawn had previous position to update board
-			if (player.getPawnLocation() != null){
-				board.setBoardLocation(player.getPawnLocation(), BoardLocation.FREE_SQUARE);
+			if (models.getPlayers()[playersTurn].getPawnLocation() != null){
+				models.getBoard().setBoardLocation(models.getPlayers()[playersTurn].getPawnLocation(), BoardLocation.FREE_SQUARE);
 			}
 			//adds players pawn to new location
-			board.setBoardLocation(boardCoord, BoardLocation.USED_SQUARE);
+			models.getBoard().setBoardLocation(boardCoord, BoardLocation.USED_SQUARE);
 			//moves player coordinates
-			player.movePawn(boardCoord);
+			models.getPlayers()[playersTurn].movePawn(boardCoord);
+			return true;
 		} else {
-			throw new Exception("Pawns can only be placed on Squares!");
+			return false;
 		}
 	}
 	
@@ -75,26 +99,25 @@ public class Quoridor {
 	 * @param player - the integer which refers to which Player is being affected
 	 * @param boardCoord - the Coordinate location the Player's Wall is to be placed on the 2-D BoardLocation array
 	 * @param isHorizontal - determines whether Wall to be placed is horizontal or vertical
-	 * @throws if Wall is placed on any type of BoardLocation which isn't an instance of a WallGap object
 	 */
-	public String addPlayerWall(Board board, Player player, Coordinate boardCoord, boolean isHorizontal) throws Exception{
+	public String addPlayerWall(Coordinate boardCoord, boolean isHorizontal){
 		//checks if board location is a WallGap
-		if (board.getBoardLocation(boardCoord) == BoardLocation.FREE_WALLGAP){
+		if (models.getBoard().getBoardLocation(boardCoord) == BoardLocation.FREE_WALLGAP){
 			//checks if Wall fits in BoardLocations and if WallGap is available
-			if (board.checkWallFits(boardCoord, isHorizontal) == true){
+			if (models.getBoard().checkWallFits(boardCoord, isHorizontal) == true){
 				//updates players walls placed
-				if (player.placeWall(boardCoord, isHorizontal) == false){
+				if (models.getPlayers()[playersTurn].placeWall(boardCoord, isHorizontal) == false){
 					return "Player Has Used All Their Walls!";
 				}
 				//updates available gaps on board and adds wall to WallGap
-				board.updateGapAvailabilty(boardCoord, isHorizontal);
+				models.getBoard().updateGapAvailabilty(boardCoord, isHorizontal);
 				return "Wall Placed";
 			} else {
 				return "No Room For Wall";
 			}
 			
 		} else {
-			throw new Exception("Walls can only be placed on Gaps!");
+			return "Invalid Move";
 		}
 	}
 }
