@@ -1,4 +1,6 @@
-package GUI;
+package gui;
+
+import gameplay.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -11,8 +13,6 @@ import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-
-import Gameplay.*;
 
 /**
  * This class creates the panel which displays the key bindings and allows the
@@ -35,6 +35,8 @@ public class KeyBindingsView implements ViewPanel {
 	private final JButton rightButton = new JButton();
 	private final JButton veritcalButton = new JButton();
 	private final JButton horizontalButton = new JButton();
+	private final JButton undoButton = new JButton();
+	private final JButton endTurnButton = new JButton();
 	
 	public KeyBindingsView() {
 		controls = new Controls();
@@ -52,6 +54,8 @@ public class KeyBindingsView implements ViewPanel {
 		JLabel rightLabel = new JLabel("Move Right: ");
 		JLabel verticalLabel = new JLabel("Place a Vertical Wall: ");
 		JLabel horizontalLabel = new JLabel("Place a Horizontal Wall: ");
+		JLabel undoLabel = new JLabel("Undo: ");
+		JLabel endTurnLabel = new JLabel("End turn: ");
 
 		// Set the properties of the components
 		backButton.setText("Back");
@@ -67,6 +71,8 @@ public class KeyBindingsView implements ViewPanel {
 		rightButton.setText(controls.getRight());
 		veritcalButton.setText(controls.getVerticalWall());
 		horizontalButton.setText(controls.getHorizontalWall());
+		undoButton.setText(controls.getUndo());
+		endTurnButton.setText(controls.getEndTurn());
 
 		// Create containers to hold the components
 		JPanel buttonPanel = new JPanel();
@@ -96,6 +102,10 @@ public class KeyBindingsView implements ViewPanel {
 		controlPanel.add(veritcalButton);
 		controlPanel.add(horizontalLabel);
 		controlPanel.add(horizontalButton);
+		controlPanel.add(undoLabel);
+		controlPanel.add(undoButton);
+		controlPanel.add(endTurnLabel);
+		controlPanel.add(endTurnButton);
 		buttonPanel.add(backButton);
 		panel.add(header, BorderLayout.NORTH);
 		panel.add(controlPanel, BorderLayout.CENTER);
@@ -161,6 +171,28 @@ public class KeyBindingsView implements ViewPanel {
 			public void actionPerformed(ActionEvent e) {
 				// Send which key is meant to be changed
 				keyToChange = "hor";
+
+				// Change the key
+				checkKeyStroke();
+			}
+			
+		});
+		
+		undoButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// Send which key is meant to be changed
+				keyToChange = "undo";
+
+				// Change the key
+				checkKeyStroke();
+			}
+			
+		});
+		
+		endTurnButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// Send which key is meant to be changed
+				keyToChange = "endTurn";
 
 				// Change the key
 				checkKeyStroke();
@@ -270,6 +302,26 @@ public class KeyBindingsView implements ViewPanel {
 								writer.close();
 								controls.setKeys("textFiles/controls/hor.txt", "hor");
 								horizontalButton.setText(controls.getHorizontalWall());
+							} catch (FileNotFoundException ex) {
+								System.out.println("File not found.");
+							}
+	                   	} else if(keyToChange == "undo"){
+							try {
+								writer = new PrintWriter("textFiles/controls/undo.txt");
+								writer.print(keyPressed);
+								writer.close();
+								controls.setKeys("textFiles/controls/undo.txt", "undo");
+								undoButton.setText(controls.getUndo());
+							} catch (FileNotFoundException ex) {
+								System.out.println("File not found.");
+							}
+	                   	} else if(keyToChange == "endTurn"){
+							try {
+								writer = new PrintWriter("textFiles/controls/endTurn.txt");
+								writer.print(keyPressed);
+								writer.close();
+								controls.setKeys("textFiles/controls/endTurn.txt", "endTurn");
+								endTurnButton.setText(controls.getEndTurn());
 							} catch (FileNotFoundException ex) {
 								System.out.println("File not found.");
 							}
