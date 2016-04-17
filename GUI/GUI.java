@@ -1,4 +1,4 @@
-package gui;
+package GUI;
 
 import java.awt.*;
 import javax.swing.*;
@@ -9,8 +9,6 @@ import javax.swing.*;
  */
 public class GUI {
 	private static JFrame frame;
-	// sizeVaraible is used to handle the resolution
-	private static int sizeVaraible = 1;
 
 	/**
 	 * A TEMPORARY main method used to check the UI during construction
@@ -24,8 +22,8 @@ public class GUI {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setResizable(false);
 		
-		frame.setMinimumSize(new Dimension(800 * sizeVaraible, 600 * sizeVaraible));
-		frame.setPreferredSize(new Dimension(800 * sizeVaraible, 600 * sizeVaraible));
+		frame.setMinimumSize(new Dimension(800, 600));
+		frame.setPreferredSize(new Dimension(800, 600));
 		frame.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
 		
 		// Initialise the Main Menu class
@@ -41,23 +39,6 @@ public class GUI {
 
 	public static void main(String[] args) {
 		GUI gui = new GUI();
-	}
-	
-	/**
-	 * This method returns a value for sizeVaraible
-	 * 
-	 * @return int sizeVaraible
-	 */
-	public static int getSizeVaraible() {
-		return sizeVaraible;
-	}
-	
-	/**
-	 * This method is used to set the size variable to i
-	 * @param int i
-	 */
-	public void setSizeVaraible(int i) {
-		sizeVaraible = i;
 	}
 	
 	/**

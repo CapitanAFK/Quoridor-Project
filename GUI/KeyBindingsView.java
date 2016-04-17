@@ -1,4 +1,4 @@
-package gui;
+package GUI;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -103,10 +103,7 @@ public class KeyBindingsView implements ViewPanel {
 
 		// Events
 		leftButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				// Get old key for later comparison
-				String oldKey = controls.getLeft();
-				
+			public void actionPerformed(ActionEvent e) {		
 				// Send which key is meant to be changed
 				keyToChange = "left";
 				
@@ -120,9 +117,6 @@ public class KeyBindingsView implements ViewPanel {
 			public void actionPerformed(ActionEvent e) {
 				// Send which key is meant to be changed
 				keyToChange = "right";
-	
-				// Get old key for later comparison
-				String oldKey = controls.getRight();
 				
 				// Change the key
 				checkKeyStroke();
@@ -134,9 +128,6 @@ public class KeyBindingsView implements ViewPanel {
 			public void actionPerformed(ActionEvent e) {
 				// Send which key is meant to be changed
 				keyToChange = "up";
-					
-				// Get old key for later comparison
-				String oldKey = controls.getUp();
 				
 				// Change the key
 				checkKeyStroke();
@@ -148,9 +139,6 @@ public class KeyBindingsView implements ViewPanel {
 			public void actionPerformed(ActionEvent e) {
 				// Send which key is meant to be changed
 				keyToChange = "down";
-
-				// Get old key for later comparison
-				String oldKey = controls.getDown();
 					
 				// Change the key
 				checkKeyStroke();
@@ -162,9 +150,6 @@ public class KeyBindingsView implements ViewPanel {
 			public void actionPerformed(ActionEvent e) {
 				// Send which key is meant to be changed
 				keyToChange = "ver";
-				
-				// Get old key for later comparison
-				String oldKey = controls.getVerticalWall();
 					
 				// Change the key
 				checkKeyStroke();
@@ -176,9 +161,6 @@ public class KeyBindingsView implements ViewPanel {
 			public void actionPerformed(ActionEvent e) {
 				// Send which key is meant to be changed
 				keyToChange = "hor";
-				
-				// Get old key for later comparison
-				String oldKey = controls.getHorizontalWall();
 
 				// Change the key
 				checkKeyStroke();

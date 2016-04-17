@@ -1,4 +1,4 @@
-package gui;
+package GUI;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -7,28 +7,25 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
+import Gameplay.Quoridor;
+import Gameplay.Rules;
+
 /**
  * This class creates a JPanel which will display a new to allow the user to setup a new game.
  */
 public class NewGameView implements ViewPanel {
 	private JPanel panel;
 	
-	public NewGameView() {
+	public NewGameView() {	
+		
 		final int blankSpace = 200;  // Blank border at the edges of the panel
+		
 		//Options for the JComboBoxes
-		String[] gameModes = {"Game Mode 1", "Game Mode 2", "Game Mode 3"};
-		String[] timeLimits = {"Time Limit 1", "Time Limit 2", "Time Limit 3"};
-		String[] wallLimits = {"Wall Limit 1", "Wall Limit 2", "Wall Limit 3"};
+		String[] gameModes = {"2 Player Game", "4 Player Game", "Tournament Mode", "Challenge Mode"};
 		
 		// Create the components
-		JComboBox gameMode = new JComboBox(gameModes);
+		final JComboBox gameMode = new JComboBox(gameModes);
 		JLabel gameModeLabel = new JLabel("Game Mode: ");
-		
-		JComboBox timeLimit = new JComboBox(timeLimits);
-		JLabel timeLimitLabel = new JLabel("Time Limit: ");
-		
-		JComboBox wallLimit = new JComboBox(wallLimits);
-		JLabel wallLimitLabel = new JLabel("Wall Limit: ");
 		
 		JButton startGameButton = new JButton();
 		JButton backButton = new JButton();
@@ -40,8 +37,6 @@ public class NewGameView implements ViewPanel {
 		
 		// Set the properties of the components	
 		gameMode.setSelectedIndex(0);
-		timeLimit.setSelectedIndex(0);
-		wallLimit.setSelectedIndex(0);
 		
 		startGameButton.setText("Start");
 		startGameButton.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -74,12 +69,6 @@ public class NewGameView implements ViewPanel {
 		newGamePanel.add(gameModeLabel);
 		newGamePanel.add(gameMode);
 		newGamePanel.add(blankLabel);
-		newGamePanel.add(timeLimitLabel);
-		newGamePanel.add(timeLimit);
-		newGamePanel.add(blankLabel);
-		newGamePanel.add(wallLimitLabel);
-		newGamePanel.add(wallLimit);
-		newGamePanel.add(blankLabel);
 		buttonPanel.add(startGameButton);
 		buttonPanel.add(backButton);
 		panel.add(header, BorderLayout.NORTH);
@@ -90,7 +79,8 @@ public class NewGameView implements ViewPanel {
 		startGameButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				panel.setVisible(false);
-				GameView gv = new GameView();
+				Rules rules = setupRules(gameMode.getSelectedItem().toString());
+				GameView gv = new GameView(rules);
 				gv.addToJFrame();
 				gv.setVisible();
 			}
@@ -104,6 +94,26 @@ public class NewGameView implements ViewPanel {
 				mm.setVisible();
 			}
 		});
+	}
+	
+	public Rules setupRules(String selectedItem){
+		System.out.println(selectedItem);
+		Rules theRules = null;
+		switch(selectedItem){
+		case "2 Player Game":
+			theRules = new Rules(10,2,new String[]{"red", "blue"});
+			break;
+		case "4 Player Game":
+			theRules = new Rules(5,4,new String[]{"red", "blue", "green", "yellow"});
+			break;
+		case "Tournament Mode":
+			theRules = new Rules(10,2,new String[]{"red", "blue"});
+			break;
+		case "Challenge Mode":
+			theRules = new Rules(10,2,new String[]{"red", "blue"});
+			break;
+		}
+		return theRules;
 	}
 	
 	/**
