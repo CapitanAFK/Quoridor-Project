@@ -1,4 +1,4 @@
-package Model;
+package model;
 
 /**
  * Wall.java - a simple class to describe the properties of a Wall object

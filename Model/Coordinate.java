@@ -1,4 +1,4 @@
-package Model;
+package model;
 
 /**
  * Coordinate.java - a simple class to define the properties for a Coordinate object

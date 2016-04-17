@@ -1,4 +1,4 @@
-package Model;
+package model;
 
 import java.awt.Color;
 
@@ -9,13 +9,13 @@ public class Pawn {
 	/** defines Coordinate location of the Pawn object on the game board */
 	private Coordinate position;
 	/** defines the colour of the Pawn object to be displayed */
-	private Color pawnColour;
+	private String pawnColour;
 	
 	/**
 	 * constructs Pawn object
 	 * @param colour - the colour of the Pawn object to be displayed
 	 */
-	public Pawn(Color colour){
+	public Pawn(String colour){
 		this.position = null;
 		this.pawnColour = colour; 
 	}
@@ -24,7 +24,7 @@ public class Pawn {
 	/**
 	 * @return the colour of the Pawn object to be displayed
 	 */
-	public Color getColour(){
+	public String getColour(){
 		return pawnColour;
 	}
 

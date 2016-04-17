@@ -1,4 +1,4 @@
-package Model;
+package model;
 
 import java.awt.Color;
 
@@ -18,7 +18,7 @@ public class Player {
 	 * @param MAX_WALL_LIMIT - sets the MAX_WALL_LIMIT variable
 	 * @param colour - sets the Player's Pawn objects colour
 	 */
-	public Player(int MAX_WALL_LIMIT, Color colour){
+	public Player(int MAX_WALL_LIMIT, String colour){
 		this.MAX_WALL_LIMIT = MAX_WALL_LIMIT;
 		wallsPlaced = 0;
 		pawn = new Pawn(colour);

@@ -1,4 +1,4 @@
-package Model;
+package model;
 
 import java.awt.Color;
 import java.util.Random;
@@ -88,8 +88,8 @@ public class Board{
 	 * creates the 2-D BoardLocation array filling the relevant BoardLocation with either a Square, Gap or WallGap
 	 */
 	public void initialiseBoard(){
-		for (int x = 1; x < 18; x++) {
-			for (int y = 1; y < 18; y++) {
+		for (int x = 1; x < 17; x++) {
+			for (int y = 1; y < 17; y++) {
 				//checks if x is not even and y is not even, then sets it as Square Object
 				if ((x % 2 != 0) && (y % 2 != 0)){
 					theBoard[x-1][y-1] = BoardLocation.FREE_SQUARE;
@@ -108,5 +108,19 @@ public class Board{
 				}
 			}
 		}
+	}
+	
+	public String toString(){
+		StringBuilder sb = new StringBuilder();
+		for (int x = 0; x < 17; x++) {
+			sb.append("[");
+			for (int y = 0; y < 17; y++) {
+				sb.append(theBoard[x][y].toString());
+				if (y == 16){
+					sb.append("] \n");
+				}
+			}
+		}
+		return sb.toString();
 	}
 }
