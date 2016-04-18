@@ -18,9 +18,7 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 
-import model.Board;
 import model.Coordinate;
 import model.Player;
 import model.Wall;
@@ -44,12 +42,11 @@ public class GameView implements ViewPanel {
 	private JLabel[][] boardSquares;
 
 	public static enum GameState {
-		PlacingVWall, PlacingHWall, MovingPlayer
+		PlacingVWall, PlacingHWall, MovingPlayer, GameEnded
 	};
 
 	private GameState currentState;
-	private int startingPlayer;
-	private boolean turnTaken;
+	private String turnTaken;
 	private ArrayList<Coordinate> validMoves;
 	private Image squareIMG = null;
 	private Image squareHighlightedIMG = null;
@@ -68,8 +65,7 @@ public class GameView implements ViewPanel {
 		controls = new Controls();
 		quoridor = new Quoridor(rules);
 		quoridor.beginGame();
-		startingPlayer = quoridor.getPlayersTurn();
-		turnTaken = false;
+		turnTaken = null;
 		currentState = GameState.MovingPlayer;
 		// setup Images
 		try {
@@ -173,17 +169,6 @@ public class GameView implements ViewPanel {
 					public void mouseClicked(MouseEvent e) {
 						squareClicked(e);
 					}
-
-					@Override
-					public void mouseEntered(MouseEvent e) {
-						squareEntered(e);
-
-					}
-
-					@Override
-					public void mouseExited(MouseEvent e) {
-						squareExited(e);
-					}
 				});
 				boardPanel.add(boardSquares[x][y]);
 			}
@@ -204,6 +189,26 @@ public class GameView implements ViewPanel {
 		endTurn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				endPlayersTurn();
+			}
+		});
+		movePawn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				movePlayerSelected();
+			}
+		});
+		vWall.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				vWallSelected();
+			}
+		});
+		hWall.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				hWallSelected();
+			}
+		});
+		undoMove.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				undoPlayersMove();
 			}
 		});
 		
@@ -239,17 +244,71 @@ public class GameView implements ViewPanel {
 		activateState();
 		updateButtons();
 	}
+	
+	
+	public void undoPlayersMove(){
+		switch(turnTaken.substring(0, 4)){
+		case "Pawn":
+			boolean change = false;
+			int i = 5;
+			String x = "";
+			String y = "";
+			while (turnTaken.charAt(i) != ' '){
+				if (turnTaken.charAt(i) == ','){
+					change = true;
+				} else if (Character.isDigit(turnTaken.charAt(i))){
+					if (change == false){
+						x += turnTaken.substring(i,i+1);
+					} else {
+						y += turnTaken.substring(i,i+1);
+					}
+				} 
+				i++;
+			}
+			Coordinate originalCoord = new Coordinate(Integer.parseInt(x),Integer.parseInt(y));
+			quoridor.movePlayersPawn(originalCoord);
+		break;
+		}
+		turnTaken = null;
+		updateBoardDisplay();
+		activateState();
+		updateButtons();
+	}
+	
+	public void hWallSelected(){
+		currentState = GameState.PlacingHWall;
+		updateBoardDisplay();
+		activateState();
+	}
+	
+	public void vWallSelected(){
+		currentState = GameState.PlacingVWall;
+		updateBoardDisplay();
+		activateState();
+	}
+	
+	public void movePlayerSelected(){
+		currentState = GameState.MovingPlayer;
+		updateBoardDisplay();
+		activateState();
+	}
 
 	public void endPlayersTurn() {
 		quoridor.endPlayersTurn();
 		currentState = GameState.MovingPlayer;
-		turnTaken = false;
+		turnTaken = null;
 		activateState();
 		updateButtons();
 	}
 
 	public void updateButtons() {
-		if (turnTaken == false) {
+		if (currentState == GameState.GameEnded){
+			vWall.setEnabled(false);
+			hWall.setEnabled(false);
+			movePawn.setEnabled(false);
+			undoMove.setEnabled(false);
+			endTurn.setEnabled(false);
+		} else if (turnTaken == null) {
 			vWall.setEnabled(true);
 			hWall.setEnabled(true);
 			movePawn.setEnabled(true);
@@ -267,7 +326,7 @@ public class GameView implements ViewPanel {
 	public void activateState() {
 		switch (currentState.toString()) {
 		case "MovingPlayer":
-			if (turnTaken == false){
+			if (turnTaken == null){
 				validMoves = quoridor.getValidMoves();
 				for (int i = 0; i < validMoves.size(); i++) {
 					boardSquares[validMoves.get(i).getX()][validMoves.get(i).getY()].setIcon(new ImageIcon(squareHighlightedIMG));
@@ -289,21 +348,16 @@ public class GameView implements ViewPanel {
 		return null;
 	}
 
-	public void squareExited(MouseEvent e) {
-	}
-
-	public void squareEntered(MouseEvent e) {
-	}
-
 	public void squareClicked(MouseEvent e) {
 		Coordinate squareCoord = getSquareCoordinates(e);
 		switch (currentState.toString()) {
 		case "MovingPlayer":
-			if (turnTaken == false){
+			if (turnTaken == null){
 				for (int i = 0; i < validMoves.size(); i++) {
 					if (squareCoord.compare(validMoves.get(i)) == true){
+						turnTaken = "Pawn "+quoridor.getPlayers()[quoridor.getPlayersTurn()].getPawnLocation().toString();
 						quoridor.movePlayersPawn(translateVCToMC(squareCoord));
-						turnTaken = true;
+						checkEndGame();
 						updateBoardDisplay();
 						activateState();
 						updateButtons();
@@ -314,6 +368,32 @@ public class GameView implements ViewPanel {
 			break;
 		}
 		
+	}
+	
+	public void checkEndGame(){
+		int playersTurn = quoridor.getPlayersTurn();
+		switch (playersTurn){
+		case 0:
+			if (quoridor.getPlayers()[playersTurn].getPawnLocation().getY() == 0){
+				currentState = GameState.GameEnded;
+			}
+		break;
+		case 1:
+			if (quoridor.getPlayers()[playersTurn].getPawnLocation().getY() == 16){
+				currentState = GameState.GameEnded;
+			}
+		break;
+		case 2:
+			if (quoridor.getPlayers()[playersTurn].getPawnLocation().getX() == 16){
+				currentState = GameState.GameEnded;
+			}
+		break;
+		case 3:
+			if (quoridor.getPlayers()[playersTurn].getPawnLocation().getX() == 0){
+				currentState = GameState.GameEnded;
+			}
+		break;
+		}
 	}
 
 	public void updateBoardDisplay() {

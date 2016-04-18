@@ -49,8 +49,40 @@ public class Coordinate {
 		this.y = y;
 	}
 	
+	public Coordinate getNorthWall(){
+		return new Coordinate(x,y-1);
+	}
+	
+	public Coordinate getEastWall(){
+		return new Coordinate(x+1,y);
+	}
+	
+	public Coordinate getSouthWall(){
+		return new Coordinate(x,y+1);
+	}
+	
+	public Coordinate getWestWall(){
+		return new Coordinate(x-1,y);
+	}
+	
+	public Coordinate getNorthSquare(){
+		return new Coordinate(x,y-2);
+	}
+	
+	public Coordinate getEastSquare(){
+		return new Coordinate(x+2,y);
+	}
+	
+	public Coordinate getSouthSquare(){
+		return new Coordinate(x,y+2);
+	}
+	
+	public Coordinate getWestSquare(){
+		return new Coordinate(x-2,y);
+	}
+	
 	public String toString(){
-		return x+", "+y;
+		return x+","+y+" ";
 	}
 	
 	public boolean compare(Coordinate coord){
