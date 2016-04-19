@@ -98,75 +98,89 @@ public class Quoridor {
 	public ArrayList<Coordinate> getValidMoves(){
 		ArrayList<Coordinate> validMoves = new ArrayList<Coordinate>();
 		Coordinate playerPos = getPlayers()[getPlayersTurn()].getPawnLocation();
-		if (inBounds(playerPos.getNorthSquare()) == true){
-			if (models.getBoard().getBoardLocation(playerPos.getNorthSquare()) == BoardLocation.FREE_SQUARE &&
-				models.getBoard().getBoardLocation(playerPos.getNorthWall()) == BoardLocation.FREE_GAP){
-				validMoves.add(playerPos.getNorthSquare());
-			} else if (inBounds(playerPos.getNorthSquare().getNorthSquare()) == true){
-				if (models.getBoard().getBoardLocation(playerPos.getNorthWall()) == BoardLocation.FREE_GAP &&
-					models.getBoard().getBoardLocation(playerPos.getNorthSquare().getNorthSquare()) == BoardLocation.FREE_SQUARE && 
-					models.getBoard().getBoardLocation(playerPos.getNorthSquare().getNorthWall()) == BoardLocation.FREE_GAP){
-					validMoves.add(playerPos.getNorthSquare().getNorthSquare());
-				} else if (models.getBoard().getBoardLocation(playerPos.getNorthWall()) == BoardLocation.FREE_GAP &&
-							models.getBoard().getBoardLocation(playerPos.getNorthSquare().getNorthSquare()) == BoardLocation.FREE_SQUARE && 
-							models.getBoard().getBoardLocation(playerPos.getNorthSquare().getNorthWall()) == BoardLocation.USED_GAP){
-					validMoves.add(playerPos.getNorthSquare().getEastSquare());
-					validMoves.add(playerPos.getNorthSquare().getWestSquare());
+		validMoves.addAll(getDirectionalValidMoves(playerPos, "north"));
+		validMoves.addAll(getDirectionalValidMoves(playerPos, "east"));
+		validMoves.addAll(getDirectionalValidMoves(playerPos, "south"));
+		validMoves.addAll(getDirectionalValidMoves(playerPos, "west"));
+		return validMoves;
+	}
+	
+	public ArrayList<Coordinate> getDirectionalValidMoves(Coordinate playerPos, String direction){
+		ArrayList<Coordinate> validMoves = new ArrayList<Coordinate>();
+		if (inBounds(playerPos.getSquare(direction))){
+			
+			if (checkFreeSquare(playerPos.getSquare(direction)) &&
+				checkFreeGap(playerPos.getWall(direction))){
+				
+				validMoves.add(playerPos.getSquare(direction));
+				
+			} else if (inBounds(playerPos.getSquare(direction).getSquare(direction))){
+				
+				if (checkFreeGap((playerPos.getWall(direction)))&&
+					checkFreeSquare(playerPos.getSquare(direction).getSquare(direction)) && 
+					checkFreeGap(playerPos.getSquare(direction).getWall(direction))){
+					
+					validMoves.add(playerPos.getSquare(direction).getSquare(direction));
+					
+				} else if ( checkFreeGap(playerPos.getWall(direction)) &&
+							checkFreeSquare(playerPos.getSquare(direction).getSquare(direction)) && 
+							!checkFreeGap(playerPos.getSquare(direction).getWall(direction))){
+					
+					if (direction == "north" || direction == "south"){
+						if (inBounds(playerPos.getSquare(direction).getSquare("east"))){
+							if (checkFreeSquare(playerPos.getSquare(direction).getSquare("east"))){
+								validMoves.add(playerPos.getSquare(direction).getSquare("east"));
+							}
+						}
+						if (inBounds(playerPos.getSquare(direction).getSquare("west"))){
+							if (checkFreeSquare(playerPos.getSquare(direction).getSquare("west"))){
+								validMoves.add(playerPos.getSquare(direction).getSquare("west"));
+							}
+						}
+					} else {
+						if (inBounds(playerPos.getSquare(direction).getSquare("north"))){
+							if (checkFreeSquare(playerPos.getSquare(direction).getSquare("north"))){
+								validMoves.add(playerPos.getSquare(direction).getSquare("north"));
+							}
+						}
+						if (inBounds(playerPos.getSquare(direction).getSquare("south"))){
+							if (checkFreeSquare(playerPos.getSquare(direction).getSquare("south"))){
+								validMoves.add(playerPos.getSquare(direction).getSquare("south"));
+							}
+						}
+					}
 				}
 			}
-		}
-		if (inBounds(playerPos.getEastSquare()) == true){
-			if (models.getBoard().getBoardLocation(playerPos.getEastSquare()) == BoardLocation.FREE_SQUARE &&
-				models.getBoard().getBoardLocation(playerPos.getEastWall()) == BoardLocation.FREE_GAP){
-				validMoves.add(playerPos.getEastSquare());
-			} else if (inBounds(playerPos.getEastSquare().getEastSquare()) == true){
-				if (models.getBoard().getBoardLocation(playerPos.getEastWall()) == BoardLocation.FREE_GAP &&
-					models.getBoard().getBoardLocation(playerPos.getEastSquare().getEastSquare()) == BoardLocation.FREE_SQUARE && 
-					models.getBoard().getBoardLocation(playerPos.getEastSquare().getEastWall()) == BoardLocation.FREE_GAP){
-					validMoves.add(playerPos.getEastSquare().getEastSquare());
-				} else if (models.getBoard().getBoardLocation(playerPos.getEastWall()) == BoardLocation.FREE_GAP &&
-							models.getBoard().getBoardLocation(playerPos.getEastSquare().getEastSquare()) == BoardLocation.FREE_SQUARE && 
-							models.getBoard().getBoardLocation(playerPos.getEastSquare().getEastWall()) == BoardLocation.USED_GAP){
-					validMoves.add(playerPos.getEastSquare().getNorthSquare());
-					validMoves.add(playerPos.getEastSquare().getSouthSquare());
-				}
-			}
-		}
-		if (inBounds(playerPos.getSouthSquare()) == true){
-			if (models.getBoard().getBoardLocation(playerPos.getSouthSquare()) == BoardLocation.FREE_SQUARE &&
-				models.getBoard().getBoardLocation(playerPos.getSouthWall()) == BoardLocation.FREE_GAP){
-				validMoves.add(playerPos.getSouthSquare());
-			}else if (inBounds(playerPos.getSouthSquare().getSouthSquare()) == true){
-				if (models.getBoard().getBoardLocation(playerPos.getSouthWall()) == BoardLocation.FREE_GAP &&
-					models.getBoard().getBoardLocation(playerPos.getSouthSquare().getSouthSquare()) == BoardLocation.FREE_SQUARE && 
-					models.getBoard().getBoardLocation(playerPos.getSouthSquare().getSouthWall()) == BoardLocation.FREE_GAP){
-					validMoves.add(playerPos.getSouthSquare().getSouthSquare());
-				} else if (models.getBoard().getBoardLocation(playerPos.getSouthWall()) == BoardLocation.FREE_GAP &&
-							models.getBoard().getBoardLocation(playerPos.getSouthSquare().getSouthSquare()) == BoardLocation.FREE_SQUARE && 
-							models.getBoard().getBoardLocation(playerPos.getSouthSquare().getSouthWall()) == BoardLocation.USED_GAP){
-					validMoves.add(playerPos.getSouthSquare().getEastSquare());
-					validMoves.add(playerPos.getSouthSquare().getWestSquare());
-				}
-			}
-		}
-		if (inBounds(playerPos.getWestSquare()) == true){
-			if (models.getBoard().getBoardLocation(playerPos.getWestSquare()) == BoardLocation.FREE_SQUARE &&
-				models.getBoard().getBoardLocation(playerPos.getWestWall()) == BoardLocation.FREE_GAP){
-				validMoves.add(playerPos.getWestSquare());
-			}else if (inBounds(playerPos.getWestSquare().getWestSquare()) == true){
-				if (models.getBoard().getBoardLocation(playerPos.getWestWall()) == BoardLocation.FREE_GAP &&
-					models.getBoard().getBoardLocation(playerPos.getWestSquare().getWestSquare()) == BoardLocation.FREE_SQUARE && 
-					models.getBoard().getBoardLocation(playerPos.getWestSquare().getWestWall()) == BoardLocation.FREE_GAP){
-					validMoves.add(playerPos.getWestSquare().getWestSquare());
-				} else if (models.getBoard().getBoardLocation(playerPos.getWestWall()) == BoardLocation.FREE_GAP &&
-							models.getBoard().getBoardLocation(playerPos.getWestSquare().getWestSquare()) == BoardLocation.FREE_SQUARE && 
-							models.getBoard().getBoardLocation(playerPos.getWestSquare().getWestWall()) == BoardLocation.USED_GAP){
-					validMoves.add(playerPos.getWestSquare().getNorthSquare());
-					validMoves.add(playerPos.getWestSquare().getSouthSquare());
-				}
-			}
+			
 		}
 		return validMoves;
+	}
+	
+	public boolean checkFreeSquare(Coordinate coord){
+		return models.getBoard().getBoardLocation(coord) == BoardLocation.FREE_SQUARE;
+	}
+	
+	public boolean checkFreeGap(Coordinate coord){
+		return models.getBoard().getBoardLocation(coord) == BoardLocation.FREE_GAP;
+	}
+	
+	public boolean checkFreeWallGap(Coordinate coord, boolean isHorizontal){
+		boolean isFree = false;
+		
+		if (isHorizontal == true){
+			if (models.getBoard().getBoardLocation(coord) == BoardLocation.FREE_WALLGAP &&
+				checkFreeGap(coord.getWall("east")) &&
+				checkFreeGap(coord.getWall("west"))){
+				isFree = true;
+			}
+		} else {
+			if (models.getBoard().getBoardLocation(coord) == BoardLocation.FREE_WALLGAP &&
+				checkFreeGap(coord.getWall("north")) &&
+				checkFreeGap(coord.getWall("south"))){
+				isFree = true;
+			}
+		}
+		return isFree;
 	}
 	
 	public boolean inBounds(Coordinate coord){
@@ -205,6 +219,26 @@ public class Quoridor {
 			
 		} else {
 			return "Invalid Move";
+		}
+	}
+	
+	public void removePlayerWall(Coordinate boardCoord){
+		ArrayList<Wall> playerWalls = getPlayers()[playersTurn].getWallsPlaced();
+		boolean isHorizontal = true;
+		for (Wall wall : playerWalls) {
+			if (wall.getPosition().compare(boardCoord)){
+				isHorizontal = wall.isHorizontal();
+				playerWalls.remove(wall);
+				break;
+			}
+		}
+		getBoard().setBoardLocation(boardCoord, BoardLocation.FREE_WALLGAP);
+		if (isHorizontal == true){
+			getBoard().setBoardLocation(boardCoord.getWall("east"), BoardLocation.FREE_GAP);
+			getBoard().setBoardLocation(boardCoord.getWall("west"), BoardLocation.FREE_GAP);
+		} else {
+			getBoard().setBoardLocation(boardCoord.getWall("north"), BoardLocation.FREE_GAP);
+			getBoard().setBoardLocation(boardCoord.getWall("south"), BoardLocation.FREE_GAP);
 		}
 	}
 }

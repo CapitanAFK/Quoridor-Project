@@ -44,7 +44,7 @@ public class GameView implements ViewPanel {
 	private JLabel[][] boardWallGaps;
 
 	public static enum GameState {
-		PlacingVWall, PlacingHWall, MovingPlayer, GameEnded
+		PlacingVWall, PlacingHWall, MovingPlayer, TurnTaken, GameEnded
 	};
 
 	private GameState currentState;
@@ -54,6 +54,8 @@ public class GameView implements ViewPanel {
 	private Image squareHighlightedIMG = null;
 	private Image vWallIMG = null;
 	private Image hWallIMG = null;
+	private Image hoverVWallIMG = null;
+	private Image hoverHWallIMG = null;
 	private Image redPawnIMG = null;
 	private Image greenPawnIMG = null;
 	private Image bluePawnIMG = null;
@@ -77,6 +79,8 @@ public class GameView implements ViewPanel {
 			squareHighlightedIMG = ImageIO.read(new File("Images/SquareHighlight.png"));
 			vWallIMG = ImageIO.read(new File("Images/vwall.png"));
 			hWallIMG = ImageIO.read(new File("Images/hwall.png"));
+			hoverVWallIMG = ImageIO.read(new File("Images/hovervwall.png"));
+			hoverHWallIMG = ImageIO.read(new File("Images/hoverhwall.png"));
 			redPawnIMG = ImageIO.read(new File("Images/RedPawn.png"));
 			greenPawnIMG = ImageIO.read(new File("Images/GreenPawn.png"));
 			bluePawnIMG = ImageIO.read(new File("Images/BluePawn.png"));
@@ -92,6 +96,10 @@ public class GameView implements ViewPanel {
 		vWallIMG = vWallIMG.getScaledInstance(8, 62,
 				BufferedImage.TYPE_INT_ARGB);
 		hWallIMG = hWallIMG.getScaledInstance(62, 8,
+				BufferedImage.TYPE_INT_ARGB);
+		hoverVWallIMG = hoverVWallIMG.getScaledInstance(8, 62,
+				BufferedImage.TYPE_INT_ARGB);
+		hoverHWallIMG = hoverHWallIMG.getScaledInstance(62, 8,
 				BufferedImage.TYPE_INT_ARGB);
 		redPawnIMG = redPawnIMG.getScaledInstance(62, 62,
 				BufferedImage.TYPE_INT_ARGB);
@@ -177,6 +185,12 @@ public class GameView implements ViewPanel {
 					public void mouseClicked(MouseEvent e) {
 						wallGapClicked(e);
 					}
+					public void mouseExited(MouseEvent e) {
+					    hideMouseHover(e);
+					}
+					public void mouseEntered(MouseEvent e) {
+					    showMouseHover(e);
+					}
 				});
 				boardPanel.add(boardWallGaps[x][y]);
 			}
@@ -189,7 +203,6 @@ public class GameView implements ViewPanel {
 				//checks if x is even and y is not even, then sets it as Gap Object
 				if ((x % 2 == 0) && (y % 2 != 0)){
 					boardLocations[x-1][y-1] = new JLabel();
-					boardLocations[x-1][y-1].setIcon(new ImageIcon(vWallIMG));
 					boardLocations[x-1][y-1].setSize(8, 62);
 					boardLocations[x-1][y-1].setLocation(((x/2) * 62)-4, ((y/2) * 62));
 					boardLocations[x-1][y-1].addMouseListener(new MouseAdapter() {
@@ -198,13 +211,11 @@ public class GameView implements ViewPanel {
 							squareClicked(e);
 						}
 					});
-					boardLocations[x-1][y-1].setVisible(false);
 					boardPanel.add(boardLocations[x-1][y-1]);
 				}
 				//checks if x is not even and y is even, then sets it as Gap Object
 				if ((x % 2 != 0) && (y % 2 == 0)){
 					boardLocations[x-1][y-1] = new JLabel();
-					boardLocations[x-1][y-1].setIcon(new ImageIcon(hWallIMG));
 					boardLocations[x-1][y-1].setSize(62, 8);
 					boardLocations[x-1][y-1].setLocation(((x/2) * 62), ((y/2) * 62)-4);
 					boardLocations[x-1][y-1].addMouseListener(new MouseAdapter() {
@@ -213,7 +224,6 @@ public class GameView implements ViewPanel {
 							squareClicked(e);
 						}
 					});
-					boardLocations[x-1][y-1].setVisible(false);
 					boardPanel.add(boardLocations[x-1][y-1]);
 				}
 			}
@@ -317,28 +327,43 @@ public class GameView implements ViewPanel {
 		}
 	}
 	
+	public Coordinate getCoordFromString(){
+		boolean change = false;
+		int i = 5;
+		String x = "";
+		String y = "";
+		while (turnTaken.charAt(i) != ' '){
+			if (turnTaken.charAt(i) == ','){
+				change = true;
+			} else if (Character.isDigit(turnTaken.charAt(i))){
+				if (change == false){
+					x += turnTaken.substring(i,i+1);
+				} else {
+					y += turnTaken.substring(i,i+1);
+				}
+			} 
+			i++;
+		}
+		return new Coordinate(Integer.parseInt(x),Integer.parseInt(y));
+	}
 	
 	public void undoPlayersMove(){
+		Coordinate coord;
 		switch(turnTaken.substring(0, 4)){
 		case "Pawn":
-			boolean change = false;
-			int i = 5;
-			String x = "";
-			String y = "";
-			while (turnTaken.charAt(i) != ' '){
-				if (turnTaken.charAt(i) == ','){
-					change = true;
-				} else if (Character.isDigit(turnTaken.charAt(i))){
-					if (change == false){
-						x += turnTaken.substring(i,i+1);
-					} else {
-						y += turnTaken.substring(i,i+1);
-					}
-				} 
-				i++;
-			}
-			Coordinate originalCoord = new Coordinate(Integer.parseInt(x),Integer.parseInt(y));
-			quoridor.movePlayersPawn(originalCoord);
+			coord = getCoordFromString();
+			quoridor.movePlayersPawn(coord);
+			currentState = GameState.MovingPlayer;
+		break;
+		case "Vall":
+			coord = getCoordFromString();
+			quoridor.removePlayerWall(coord);
+			currentState = GameState.PlacingVWall;
+		break;
+		case "Hall":
+			coord = getCoordFromString();
+			quoridor.removePlayerWall(coord);
+			currentState = GameState.PlacingHWall;
 		break;
 		}
 		turnTaken = null;
@@ -381,31 +406,28 @@ public class GameView implements ViewPanel {
 			movePawn.setEnabled(false);
 			undoMove.setEnabled(false);
 			endTurn.setEnabled(false);
-		} else if (turnTaken == null) {
-			vWall.setEnabled(true);
-			hWall.setEnabled(true);
-			movePawn.setEnabled(true);
-			undoMove.setEnabled(false);
-			endTurn.setEnabled(false);
-		} else {
+		} else if (currentState == GameState.TurnTaken) {
 			vWall.setEnabled(false);
 			hWall.setEnabled(false);
 			movePawn.setEnabled(false);
 			undoMove.setEnabled(true);
 			endTurn.setEnabled(true);
+		} else {
+			vWall.setEnabled(true);
+			hWall.setEnabled(true);
+			movePawn.setEnabled(true);
+			undoMove.setEnabled(false);
+			endTurn.setEnabled(false);
 		}
 	}
 
 	public void activateState() {
-		System.out.println(quoridor.getBoard().toString());
 		switch (currentState.toString()) {
 		case "MovingPlayer":
 			setWallGapsVisible(false);
-			if (turnTaken == null){
-				validMoves = quoridor.getValidMoves();
-				for (int i = 0; i < validMoves.size(); i++) {
-					boardLocations[validMoves.get(i).getX()][validMoves.get(i).getY()].setIcon(new ImageIcon(squareHighlightedIMG));
-				}
+			validMoves = quoridor.getValidMoves();
+			for (int i = 0; i < validMoves.size(); i++) {
+				boardLocations[validMoves.get(i).getX()][validMoves.get(i).getY()].setIcon(new ImageIcon(squareHighlightedIMG));
 			}
 			break;
 		case "PlacingVWall":
@@ -414,7 +436,11 @@ public class GameView implements ViewPanel {
 		case "PlacingHWall":
 			setWallGapsVisible(true);
 			break;
+		case "TurnTaken":
+			setWallGapsVisible(false);
+			break;
 		}
+		
 	}
 	
 
@@ -441,26 +467,63 @@ public class GameView implements ViewPanel {
 	}
 	
 	public void wallGapClicked(MouseEvent e) {
-		Coordinate squareCoord = getWallGapCoordinates(e);
+		Coordinate gapCoord = getWallGapCoordinates(e);
+		Coordinate boardCoord = convertVGtoMG(gapCoord);
 		switch (currentState.toString()) {
 		case "PlacingHWall":
-			if (turnTaken == null){
-				Coordinate boardCoord = convertVGtoMG(squareCoord);
-				if (quoridor.addPlayerWall(boardCoord, true) == "Wall Placed"){
-					turnTaken = "Wall "+boardCoord.toString();
-					updateBoardDisplay();
-					updateButtons();
-				}
+			if (quoridor.addPlayerWall(boardCoord, true) == "Wall Placed"){
+				currentState = GameState.TurnTaken;
+				turnTaken = "Hall "+boardCoord.toString();
+				updateBoardDisplay();
+				activateState();
+				updateButtons();
 			}
 			break;
 		case "PlacingVWall":
-			if (turnTaken == null){
-				Coordinate boardCoord = convertVGtoMG(squareCoord);
-				if (quoridor.addPlayerWall(boardCoord, false) == "Wall Placed"){
-					turnTaken = "Wall "+boardCoord.toString();
-					updateBoardDisplay();
-					updateButtons();
-				}
+			if (quoridor.addPlayerWall(boardCoord, false) == "Wall Placed"){
+				currentState = GameState.TurnTaken;
+				turnTaken = "Vall "+boardCoord.toString();
+				updateBoardDisplay();
+				activateState();
+				updateButtons();
+			}
+			break;
+		}
+	}
+	
+	public void showMouseHover(MouseEvent e){
+		Coordinate gapCoord = getWallGapCoordinates(e);
+		Coordinate boardCoord = convertVGtoMG(gapCoord);
+		switch (currentState.toString()) {
+		case "PlacingHWall":
+			if (quoridor.checkFreeWallGap(boardCoord, true)){
+				boardLocations[boardCoord.getWall("east").getX()][boardCoord.getY()].setIcon(new ImageIcon(hoverHWallIMG));
+				boardLocations[boardCoord.getWall("west").getX()][boardCoord.getY()].setIcon(new ImageIcon(hoverHWallIMG));
+			}
+			break;
+		case "PlacingVWall":
+			if (quoridor.checkFreeWallGap(boardCoord, false)){
+				boardLocations[boardCoord.getX()][boardCoord.getWall("north").getY()].setIcon(new ImageIcon(hoverVWallIMG));
+				boardLocations[boardCoord.getX()][boardCoord.getWall("south").getY()].setIcon(new ImageIcon(hoverVWallIMG));
+			}
+			break;
+		}
+	}
+	
+	public void hideMouseHover(MouseEvent e){
+		Coordinate gapCoord = getWallGapCoordinates(e);
+		Coordinate boardCoord = convertVGtoMG(gapCoord);
+		switch (currentState.toString()) {
+		case "PlacingHWall":
+			if (quoridor.checkFreeWallGap(boardCoord, true)){
+				boardLocations[boardCoord.getWall("east").getX()][boardCoord.getY()].setIcon(null);
+				boardLocations[boardCoord.getWall("west").getX()][boardCoord.getY()].setIcon(null);
+			}
+			break;
+		case "PlacingVWall":
+			if (quoridor.checkFreeWallGap(boardCoord, false)){
+				boardLocations[boardCoord.getX()][boardCoord.getWall("north").getY()].setIcon(null);
+				boardLocations[boardCoord.getX()][boardCoord.getWall("south").getY()].setIcon(null);
 			}
 			break;
 		}
@@ -477,9 +540,11 @@ public class GameView implements ViewPanel {
 			if (turnTaken == null){
 				for (int i = 0; i < validMoves.size(); i++) {
 					if (squareCoord.compare(validMoves.get(i)) == true){
+						currentState = GameState.TurnTaken;
 						turnTaken = "Pawn "+quoridor.getPlayers()[quoridor.getPlayersTurn()].getPawnLocation().toString();
 						quoridor.movePlayersPawn(squareCoord);
 						checkEndGame();
+						activateState();
 						updateBoardDisplay();
 						updateButtons();
 						break;
@@ -522,8 +587,11 @@ public class GameView implements ViewPanel {
 		int i = 0;
 		for (int x = 0; x < 17; x++) {
 			for (int y = 0; y < 17; y++) {
-				if (quoridor.getBoard().getBoardLocation(new Coordinate(x,y)) == BoardLocation.FREE_SQUARE){
+				if (quoridor.checkFreeSquare(new Coordinate(x,y))){
 					boardLocations[x][y].setIcon(new ImageIcon(squareIMG));
+				}
+				if (quoridor.checkFreeGap(new Coordinate(x,y))){
+					boardLocations[x][y].setIcon(null);
 				}
 			}
 		}
@@ -534,11 +602,11 @@ public class GameView implements ViewPanel {
 				boardLocations[pawnLocation.getX()][pawnLocation.getY()].setIcon(new ImageIcon(getPlayersImage(i)));
 				for (Wall wall : player.getWallsPlaced()) {
 					if (wall.isHorizontal() == true){
-						boardLocations[wall.getPosition().getWestWall().getX()][wall.getPosition().getY()].setVisible(true);
-						boardLocations[wall.getPosition().getEastWall().getX()][wall.getPosition().getY()].setVisible(true);
+						boardLocations[wall.getPosition().getWall("west").getX()][wall.getPosition().getY()].setIcon(new ImageIcon(hWallIMG));
+						boardLocations[wall.getPosition().getWall("east").getX()][wall.getPosition().getY()].setIcon(new ImageIcon(hWallIMG));
 					} else {
-						boardLocations[wall.getPosition().getX()][wall.getPosition().getNorthWall().getY()].setVisible(true);
-						boardLocations[wall.getPosition().getX()][wall.getPosition().getSouthWall().getY()].setVisible(true);
+						boardLocations[wall.getPosition().getX()][wall.getPosition().getWall("north").getY()].setIcon(new ImageIcon(vWallIMG));
+						boardLocations[wall.getPosition().getX()][wall.getPosition().getWall("south").getY()].setIcon(new ImageIcon(vWallIMG));
 					}
 				}
 			}

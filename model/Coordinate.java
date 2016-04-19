@@ -49,36 +49,24 @@ public class Coordinate {
 		this.y = y;
 	}
 	
-	public Coordinate getNorthWall(){
-		return new Coordinate(x,y-1);
+	public Coordinate getWall(String direction){
+		switch (direction){
+		case "north":return new Coordinate(x,y-1);
+		case "east":return new Coordinate(x+1,y);
+		case "south":return new Coordinate(x,y+1);
+		case "west":return new Coordinate(x-1,y);
+		}
+		return null;
 	}
 	
-	public Coordinate getEastWall(){
-		return new Coordinate(x+1,y);
-	}
-	
-	public Coordinate getSouthWall(){
-		return new Coordinate(x,y+1);
-	}
-	
-	public Coordinate getWestWall(){
-		return new Coordinate(x-1,y);
-	}
-	
-	public Coordinate getNorthSquare(){
-		return new Coordinate(x,y-2);
-	}
-	
-	public Coordinate getEastSquare(){
-		return new Coordinate(x+2,y);
-	}
-	
-	public Coordinate getSouthSquare(){
-		return new Coordinate(x,y+2);
-	}
-	
-	public Coordinate getWestSquare(){
-		return new Coordinate(x-2,y);
+	public Coordinate getSquare(String direction){
+		switch (direction){
+		case "north":return new Coordinate(x,y-2);
+		case "east":return new Coordinate(x+2,y);
+		case "south":return new Coordinate(x,y+2);
+		case "west":return new Coordinate(x-2,y);
+		}
+		return null;
 	}
 	
 	public String toString(){
