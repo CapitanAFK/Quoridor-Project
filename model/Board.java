@@ -115,7 +115,7 @@ public class Board{
 		for (int x = 0; x < 17; x++) {
 			sb.append("[");
 			for (int y = 0; y < 17; y++) {
-				sb.append(theBoard[x][y].toString());
+				sb.append(theBoard[x][y].toString()+"	");
 				if (y == 16){
 					sb.append("] \n");
 				}

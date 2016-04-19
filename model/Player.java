@@ -1,6 +1,7 @@
 package model;
 
 import java.awt.Color;
+import java.util.ArrayList;
 
 /**
  * Player.java - a class to describe the properties and functionality of a Player object
@@ -9,7 +10,8 @@ public class Player {
 	/** defines the maximum amount of walls the Player is allowed to place */
 	private final int MAX_WALL_LIMIT;
 	/** defines the current amount of walls the Player has placed */
-	private int wallsPlaced;
+	private ArrayList<Wall> wallsPlaced;
+
 	/** defines the Pawn object which represents the Player's piece */
 	private Pawn pawn;
 	
@@ -20,7 +22,7 @@ public class Player {
 	 */
 	public Player(int MAX_WALL_LIMIT, String colour){
 		this.MAX_WALL_LIMIT = MAX_WALL_LIMIT;
-		wallsPlaced = 0;
+		wallsPlaced = new ArrayList<Wall>();
 		pawn = new Pawn(colour);
 	}
 	
@@ -37,8 +39,8 @@ public class Player {
 	 */
 	public Boolean placeWall(Coordinate coord, boolean isHorizontal){
 		//checks to see if a Player has placed as many walls as they have available
-		if (wallsPlaced < MAX_WALL_LIMIT){
-			wallsPlaced++;
+		if (wallsPlaced.size() < MAX_WALL_LIMIT){
+			wallsPlaced.add(new Wall(coord, isHorizontal));
 			return true;
 		} else {
 			return false;
@@ -58,6 +60,10 @@ public class Player {
 	 */
 	public Pawn getPawn(){
 		return pawn;
+	}
+
+	public ArrayList<Wall> getWallsPlaced() {
+		return wallsPlaced;
 	}
 
 }

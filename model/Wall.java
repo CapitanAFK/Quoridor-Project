@@ -8,8 +8,6 @@ public class Wall {
 	private Coordinate position;
 	/** defines whether the rotation of the wall is horizontal or vertical */
 	private boolean isHorizontal;
-	/** defines the owner of the wall */
-	private int owner;
 	
 	/**
 	 * constructs the Wall object
@@ -33,19 +31,5 @@ public class Wall {
 	 */
 	public boolean isHorizontal() {
 		return isHorizontal;
-	}
-
-	/**
-	 * @return int which references the player number
-	 */
-	public int getOwner() {
-		return owner;
-	}
-
-	/**
-	 * @param sets int which references the player number
-	 */
-	public void setOwner(int owner) {
-		this.owner = owner;
 	}		
 }
