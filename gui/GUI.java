@@ -1,6 +1,9 @@
 package gui;
 
 import java.awt.*;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 import javax.swing.*;
 
 /**
@@ -9,14 +12,15 @@ import javax.swing.*;
  */
 public class GUI {
 	private static JFrame frame;
+	private Language currentLanguage;
 
-	/**
-	 * A TEMPORARY main method used to check the UI during construction
-	 * This method will later be removed
-	 */
-	public GUI() {		
+	public GUI() {	
+		// Set the current language
+		currentLanguage = new Language();
+		ResourceBundle messages = currentLanguage.getMessages();
+		
 		// Create containers to hold the components
-		frame = new JFrame("Project's Title COMP7");
+		frame = new JFrame(messages.getString("project_title"));
 		
 		// Set the default operations and characteristics
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

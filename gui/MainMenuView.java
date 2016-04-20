@@ -3,6 +3,8 @@ package gui;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -11,32 +13,37 @@ import javax.swing.border.EmptyBorder;
  * This class creates the panel which holds the main menu.
  */
 public class MainMenuView implements ViewPanel {
-	private JPanel panel; 
+	private JPanel panel;
+	private Language currentLanguage;
 	
 	public MainMenuView() {
+		// Set the current language
+		currentLanguage = new Language();
+		ResourceBundle messages = currentLanguage.getMessages();
+		
 		final int blankSpace = 200;  // Blank border at the edges of the panel
 		
 		// Create the components
-		ImageIcon logoImage = new ImageIcon("images/logo.png");
+		ImageIcon logoImage = new ImageIcon(messages.getString("main_menu_title"));
 		JLabel logo = new JLabel(logoImage);
 		JButton newGameButton = new JButton();
 		JButton optionsButton = new JButton();
 		JButton exitButton = new JButton();
 
 		// Set the properties of the components	
-		newGameButton.setText("New Game");
+		newGameButton.setText(messages.getString("new_game"));
 		newGameButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 		newGameButton.setMinimumSize(new Dimension(75, 50));
 		newGameButton.setPreferredSize(new Dimension(75, 50));
 		newGameButton.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
 		
-		optionsButton.setText("Options");
+		optionsButton.setText(messages.getString("options"));
 		optionsButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 		optionsButton.setMinimumSize(new Dimension(75, 50));
 		optionsButton.setPreferredSize(new Dimension(75, 50));
 		optionsButton.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
 		
-		exitButton.setText("Exit");
+		exitButton.setText(messages.getString("exit"));
 		exitButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 		exitButton.setMinimumSize(new Dimension(75, 50));
 		exitButton.setPreferredSize(new Dimension(75, 50));

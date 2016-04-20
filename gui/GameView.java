@@ -15,6 +15,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -61,12 +62,13 @@ public class GameView implements ViewPanel {
 	private Image bluePawnIMG = null;
 	private Image yellowPawnIMG = null;
 
-	/**
-	 * This constructor creates and object of class Board and an appropriate
-	 * panel which is to be added to the main JFrame THE COLOURS ARE TEMPORARY
-	 * AND WILL BE REPLACED BY SPRITES LATER
-	 */
+	private Language currentLanguage;
+	
 	public GameView(Rules rules) {
+		// Set the current language
+		currentLanguage = new Language();
+		ResourceBundle messages = currentLanguage.getMessages();
+		
 		// Initialise Game
 		controls = new Controls();
 		quoridor = new Quoridor(rules);
@@ -118,43 +120,43 @@ public class GameView implements ViewPanel {
 		endTurn = new JButton();
 
 		// Set the properties of the components
-		playersTurnLabel = new JLabel("Players Turn : ");
+		playersTurnLabel = new JLabel(messages.getString("players_turn"));
 		
-		exitButton.setText("Give Up");
+		exitButton.setText(messages.getString("give_up"));
 		exitButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 		exitButton.setMinimumSize(new Dimension(100, 50));
 		exitButton.setPreferredSize(new Dimension(100, 50));
 		exitButton.setMaximumSize(new Dimension(100, 50));
 
-		vWall.setText("Ver. Wall");
+		vWall.setText(messages.getString("ver_wall"));
 		vWall.setAlignmentX(Component.CENTER_ALIGNMENT);
 		vWall.setMinimumSize(new Dimension(100, 50));
 		vWall.setPreferredSize(new Dimension(100, 50));
 		vWall.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
 		vWall.setEnabled(false);
 
-		hWall.setText("Hor. Wall");
+		hWall.setText(messages.getString("hor_wall"));
 		hWall.setAlignmentX(Component.CENTER_ALIGNMENT);
 		hWall.setMinimumSize(new Dimension(100, 50));
 		hWall.setPreferredSize(new Dimension(100, 50));
 		hWall.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
 		hWall.setEnabled(false);
 
-		movePawn.setText("Move Pawn");
+		movePawn.setText(messages.getString("move_pawn"));
 		movePawn.setAlignmentX(Component.CENTER_ALIGNMENT);
 		movePawn.setMinimumSize(new Dimension(100, 50));
 		movePawn.setPreferredSize(new Dimension(100, 50));
 		movePawn.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
 		movePawn.setEnabled(false);
 
-		undoMove.setText("Undo Move");
+		undoMove.setText(messages.getString("undo"));
 		undoMove.setAlignmentX(Component.CENTER_ALIGNMENT);
 		undoMove.setMinimumSize(new Dimension(100, 50));
 		undoMove.setPreferredSize(new Dimension(100, 50));
 		undoMove.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
 		undoMove.setEnabled(false);
 
-		endTurn.setText("End Turn");
+		endTurn.setText(messages.getString("end_turn"));
 		endTurn.setAlignmentX(Component.CENTER_ALIGNMENT);
 		endTurn.setMinimumSize(new Dimension(100, 50));
 		endTurn.setPreferredSize(new Dimension(100, 50));
@@ -302,11 +304,16 @@ public class GameView implements ViewPanel {
 
 		exitButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				int confirmed = JOptionPane.showConfirmDialog(null,
-						"Are you sure you want to quit the game?",
-						"Exit Game?", JOptionPane.YES_NO_OPTION);
-
-				if (confirmed == JOptionPane.YES_OPTION) {
+				int confirmed = JOptionPane.showOptionDialog(null, 
+						messages.getString("give_up_confirm_message"), 
+						messages.getString("give_up_title"), 
+				        JOptionPane.YES_NO_OPTION, 
+				        JOptionPane.INFORMATION_MESSAGE, 
+				        null, 
+				        new String[]{messages.getString("yes"), messages.getString("no")},
+				        "default");
+				
+				if (confirmed == 0) {
 					panel.setVisible(false);
 					MainMenuView mm = new MainMenuView();
 					mm.addToJFrame();
@@ -314,6 +321,7 @@ public class GameView implements ViewPanel {
 				}
 			}
 		});
+		
 		updateBoardDisplay();
 		activateState();
 		updateButtons();

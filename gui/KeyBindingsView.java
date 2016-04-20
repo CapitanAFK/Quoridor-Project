@@ -13,6 +13,7 @@ import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.util.ResourceBundle;
 
 /**
  * This class creates the panel which displays the key bindings and allows the
@@ -27,6 +28,8 @@ public class KeyBindingsView implements ViewPanel {
 	private char key;
 	public String keyPressed;
 	
+	private Language currentLanguage;
+	
 	//Buttons
 	private final JButton backButton = new JButton();
 	private final JButton upButton = new JButton();
@@ -39,26 +42,31 @@ public class KeyBindingsView implements ViewPanel {
 	private final JButton endTurnButton = new JButton();
 	
 	public KeyBindingsView() {
+		// Set the current language
+		currentLanguage = new Language();
+		ResourceBundle messages = currentLanguage.getMessages();
+		
+		// Set the controls
 		controls = new Controls();
 		keyToChange = null;
 
 		final int blankSpace = 200; // Blank border at the edges of the panel
 
 		// Create the components
-		ImageIcon headerImage = new ImageIcon("images/keyBindings.png");
+		ImageIcon headerImage = new ImageIcon(messages.getString("key_bindings_title"));
 		JLabel header = new JLabel(headerImage);
 
-		JLabel upLabel = new JLabel("Move Up: ");
-		JLabel downLabel = new JLabel("Move Down: ");
-		JLabel leftabel = new JLabel("Move Left: ");
-		JLabel rightLabel = new JLabel("Move Right: ");
-		JLabel verticalLabel = new JLabel("Place a Vertical Wall: ");
-		JLabel horizontalLabel = new JLabel("Place a Horizontal Wall: ");
-		JLabel undoLabel = new JLabel("Undo: ");
-		JLabel endTurnLabel = new JLabel("End turn: ");
+		JLabel upLabel = new JLabel(messages.getString("move_up"));
+		JLabel downLabel = new JLabel(messages.getString("move_down"));
+		JLabel leftabel = new JLabel(messages.getString("move_left"));
+		JLabel rightLabel = new JLabel(messages.getString("move_right"));
+		JLabel verticalLabel = new JLabel(messages.getString("place_ver_wall"));
+		JLabel horizontalLabel = new JLabel(messages.getString("place_hor_wall"));
+		JLabel undoLabel = new JLabel(messages.getString("undo_kb"));
+		JLabel endTurnLabel = new JLabel(messages.getString("end_turn_kb"));
 
 		// Set the properties of the components
-		backButton.setText("Back");
+		backButton.setText(messages.getString("back"));
 		backButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 		backButton.setMinimumSize(new Dimension(75, 50));
 		backButton.setPreferredSize(new Dimension(75, 50));

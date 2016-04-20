@@ -6,6 +6,7 @@ import gameplay.Rules;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ResourceBundle;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -17,25 +18,30 @@ public class NewGameView implements ViewPanel {
 	private JPanel panel;
 	private final JComboBox gameMode;
 	private final JComboBox gameRules;
+	private Language currentLanguage;
+	
 	
 	public NewGameView() {	
+		// Set the current language
+		currentLanguage = new Language();
+		ResourceBundle messages = currentLanguage.getMessages();
 		
 		final int blankSpace = 200;  // Blank border at the edges of the panel
 		
 		//Options for the JComboBoxes
-		String[] gamePlayersStrings = {"2 Player Game", "4 Player Game"};
-		String[] gameRulesStrings = {"Normal Rules", "Challenge Rules"};
+		String[] gamePlayersStrings = {messages.getString("2_player_game"), messages.getString("4_player_game")};
+		String[] gameRulesStrings = {messages.getString("normal_rules"), messages.getString("challenge_rules")};
 		
 		// Create the components
 		gameMode = new JComboBox(gamePlayersStrings);
 		gameRules = new JComboBox(gameRulesStrings);
-		JLabel gameModeLabel = new JLabel("Game Mode: ");
-		JLabel gameRulesLabel = new JLabel("Game Rules: ");
+		JLabel gameModeLabel = new JLabel(messages.getString("game_mode"));
+		JLabel gameRulesLabel = new JLabel(messages.getString("game_rules"));
 		
 		JButton startGameButton = new JButton();
 		JButton backButton = new JButton();
 		
-		ImageIcon headerImage = new ImageIcon("images/newGame.png");
+		ImageIcon headerImage = new ImageIcon(messages.getString("new_game_title"));
 		JLabel header = new JLabel(headerImage);
 		
 		JLabel blankLabel = new JLabel(" ");
@@ -44,13 +50,13 @@ public class NewGameView implements ViewPanel {
 		gameMode.setSelectedIndex(0);
 		gameRules.setSelectedIndex(0);
 		
-		startGameButton.setText("Start");
+		startGameButton.setText(messages.getString("start"));
 		startGameButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 		startGameButton.setMinimumSize(new Dimension(75, 50));
 		startGameButton.setPreferredSize(new Dimension(75, 50));
 		startGameButton.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
 		
-		backButton.setText("Back");
+		backButton.setText(messages.getString("back"));
 		backButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 		backButton.setMinimumSize(new Dimension(75, 50));
 		backButton.setPreferredSize(new Dimension(75, 50));
@@ -113,12 +119,12 @@ public class NewGameView implements ViewPanel {
 		int wallCount = 0;
 		String[] colours = null;
 		switch(gameMode.getSelectedItem().toString()){
-		case "2 Player Game":
+		case "2":
 			playerCount = 2;
 			wallCount = 10;
 			colours = new String[]{"red", "blue"};
 			break;
-		case "4 Player Game":
+		case "4":
 			playerCount = 4;
 			wallCount = 5;
 			colours = new String[]{"red", "blue", "green", "yellow"};
