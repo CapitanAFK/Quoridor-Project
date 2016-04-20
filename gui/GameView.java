@@ -62,13 +62,11 @@ public class GameView implements ViewPanel {
 	private Image bluePawnIMG = null;
 	private Image yellowPawnIMG = null;
 
-	private Language currentLanguage;
+	// Set the current language
+	private Language currentLanguage = new Language();
+	private ResourceBundle messages = currentLanguage.getMessages();
 	
-	public GameView(Rules rules) {
-		// Set the current language
-		currentLanguage = new Language();
-		ResourceBundle messages = currentLanguage.getMessages();
-		
+	public GameView(Rules rules) {		
 		// Initialise Game
 		controls = new Controls();
 		quoridor = new Quoridor(rules);
@@ -120,7 +118,7 @@ public class GameView implements ViewPanel {
 		endTurn = new JButton();
 
 		// Set the properties of the components
-		playersTurnLabel = new JLabel(messages.getString("players_turn"));
+		playersTurnLabel = new JLabel("Players Turn");
 		
 		exitButton.setText(messages.getString("give_up"));
 		exitButton.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -590,7 +588,7 @@ public class GameView implements ViewPanel {
 	}
 
 	public void updateBoardDisplay() {
-		playersTurnLabel.setText("Players Turn : "+(quoridor.getPlayersTurn()+1));
+		playersTurnLabel.setText(messages.getString("players_turn") +(quoridor.getPlayersTurn()+1));
 		Player[] players = quoridor.getPlayers();
 		int i = 0;
 		for (int x = 0; x < 17; x++) {
