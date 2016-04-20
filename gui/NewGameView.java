@@ -118,7 +118,7 @@ public class NewGameView implements ViewPanel {
 		int playerCount = 0;
 		int wallCount = 0;
 		String[] colours = null;
-		switch(gameMode.getSelectedItem().toString()){
+		switch(gameMode.getSelectedItem().toString().substring(0, 1)){
 		case "2":
 			playerCount = 2;
 			wallCount = 10;
