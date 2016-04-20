@@ -128,23 +128,27 @@ public class Quoridor {
 					
 					if (direction == "north" || direction == "south"){
 						if (inBounds(playerPos.getSquare(direction).getSquare("east"))){
-							if (checkFreeSquare(playerPos.getSquare(direction).getSquare("east"))){
+							if (checkFreeSquare(playerPos.getSquare(direction).getSquare("east"))&&
+								checkFreeGap(playerPos.getSquare(direction).getWall("east"))){
 								validMoves.add(playerPos.getSquare(direction).getSquare("east"));
 							}
 						}
 						if (inBounds(playerPos.getSquare(direction).getSquare("west"))){
-							if (checkFreeSquare(playerPos.getSquare(direction).getSquare("west"))){
+							if (checkFreeSquare(playerPos.getSquare(direction).getSquare("west"))&&
+								checkFreeGap(playerPos.getSquare(direction).getWall("west"))){
 								validMoves.add(playerPos.getSquare(direction).getSquare("west"));
 							}
 						}
 					} else {
 						if (inBounds(playerPos.getSquare(direction).getSquare("north"))){
-							if (checkFreeSquare(playerPos.getSquare(direction).getSquare("north"))){
+							if (checkFreeSquare(playerPos.getSquare(direction).getSquare("north")) &&
+								checkFreeGap(playerPos.getSquare(direction).getWall("north"))){
 								validMoves.add(playerPos.getSquare(direction).getSquare("north"));
 							}
 						}
 						if (inBounds(playerPos.getSquare(direction).getSquare("south"))){
-							if (checkFreeSquare(playerPos.getSquare(direction).getSquare("south"))){
+							if (checkFreeSquare(playerPos.getSquare(direction).getSquare("south")) &&
+								checkFreeGap(playerPos.getSquare(direction).getWall("south"))){
 								validMoves.add(playerPos.getSquare(direction).getSquare("south"));
 							}
 						}
