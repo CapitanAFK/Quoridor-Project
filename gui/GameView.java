@@ -295,7 +295,52 @@ public class GameView implements ViewPanel {
 
             @Override
             public void keyPressed(KeyEvent e) {
-            	if(Character.toUpperCase(e.getKeyChar()) == controls.getUp().charAt(0)){
+            	if (currentState != GameState.GameEnded){
+	            	if (currentState != GameState.TurnTaken){
+		            	if (Character.toUpperCase(e.getKeyChar()) == controls.getUp().charAt(0)){
+		            		currentState = GameState.MovingPlayer;
+		            		activateState();
+		            		Coordinate squareCoord = quoridor.getPlayers()[quoridor.getPlayersTurn()].getPawnLocation().getSquare("north");
+		    				if (movePlayer(squareCoord) == false){
+		    					squareCoord = squareCoord.getSquare("north");
+			    				movePlayer(squareCoord);
+		    				}
+		            	} else if (Character.toUpperCase(e.getKeyChar()) == controls.getDown().charAt(0)){
+		            		currentState = GameState.MovingPlayer;
+		            		activateState();
+		            		Coordinate squareCoord = quoridor.getPlayers()[quoridor.getPlayersTurn()].getPawnLocation().getSquare("south");
+		            		if (movePlayer(squareCoord) == false){
+		    					squareCoord = squareCoord.getSquare("south");
+			    				movePlayer(squareCoord);
+		    				}
+		            	} else if (Character.toUpperCase(e.getKeyChar()) == controls.getLeft().charAt(0)){
+		            		currentState = GameState.MovingPlayer;
+		            		activateState();
+		            		Coordinate squareCoord = quoridor.getPlayers()[quoridor.getPlayersTurn()].getPawnLocation().getSquare("west");
+		            		if (movePlayer(squareCoord) == false){
+		    					squareCoord = squareCoord.getSquare("west");
+			    				movePlayer(squareCoord);
+		    				}
+		            	} else if (Character.toUpperCase(e.getKeyChar()) == controls.getRight().charAt(0)){
+		            		currentState = GameState.MovingPlayer;
+		            		activateState();
+		            		Coordinate squareCoord = quoridor.getPlayers()[quoridor.getPlayersTurn()].getPawnLocation().getSquare("east");
+		            		if (movePlayer(squareCoord) == false){
+		    					squareCoord = squareCoord.getSquare("east");
+			    				movePlayer(squareCoord);
+		    				}
+		            	} else if (Character.toUpperCase(e.getKeyChar()) == controls.getVerticalWall().charAt(0)){
+		            		vWallSelected();
+		            	} else if (Character.toUpperCase(e.getKeyChar()) == controls.getHorizontalWall().charAt(0)){
+		            		hWallSelected();
+		            	}
+		            } else {
+		            	if (Character.toUpperCase(e.getKeyChar()) == controls.getEndTurn().charAt(0)){
+		            		endPlayersTurn();
+		            	} else if (Character.toUpperCase(e.getKeyChar()) == controls.getUndo().charAt(0)){
+		            		undoPlayersMove();
+		            	}
+		            }
             	}
             }
         });
@@ -373,26 +418,22 @@ public class GameView implements ViewPanel {
 		break;
 		}
 		turnTaken = null;
-		updateBoardDisplay();
 		activateState();
 		updateButtons();
 	}
 	
 	public void hWallSelected(){
 		currentState = GameState.PlacingHWall;
-		updateBoardDisplay();
 		activateState();
 	}
 	
 	public void vWallSelected(){
 		currentState = GameState.PlacingVWall;
-		updateBoardDisplay();
 		activateState();
 	}
 	
 	public void movePlayerSelected(){
 		currentState = GameState.MovingPlayer;
-		updateBoardDisplay();
 		activateState();
 	}
 
@@ -400,7 +441,6 @@ public class GameView implements ViewPanel {
 		quoridor.endPlayersTurn();
 		currentState = GameState.MovingPlayer;
 		turnTaken = null;
-		updateBoardDisplay();
 		activateState();
 		updateButtons();
 	}
@@ -428,6 +468,7 @@ public class GameView implements ViewPanel {
 	}
 
 	public void activateState() {
+		updateBoardDisplay();
 		switch (currentState.toString()) {
 		case "MovingPlayer":
 			setWallGapsVisible(false);
@@ -446,7 +487,7 @@ public class GameView implements ViewPanel {
 			setWallGapsVisible(false);
 			break;
 		}
-		
+		getJPanel().requestFocus();
 	}
 	
 
@@ -480,7 +521,6 @@ public class GameView implements ViewPanel {
 			if (quoridor.addPlayerWall(boardCoord, true) == "Wall Placed"){
 				currentState = GameState.TurnTaken;
 				turnTaken = "Hall "+boardCoord.toString();
-				updateBoardDisplay();
 				activateState();
 				updateButtons();
 			}
@@ -489,7 +529,6 @@ public class GameView implements ViewPanel {
 			if (quoridor.addPlayerWall(boardCoord, false) == "Wall Placed"){
 				currentState = GameState.TurnTaken;
 				turnTaken = "Vall "+boardCoord.toString();
-				updateBoardDisplay();
 				activateState();
 				updateButtons();
 			}
@@ -541,6 +580,10 @@ public class GameView implements ViewPanel {
 
 	public void squareClicked(MouseEvent e) {
 		Coordinate squareCoord = getSquareCoordinates(e);
+		movePlayer(squareCoord);
+	}
+	
+	public boolean movePlayer(Coordinate squareCoord){
 		switch (currentState.toString()) {
 		case "MovingPlayer":
 			if (turnTaken == null){
@@ -551,39 +594,19 @@ public class GameView implements ViewPanel {
 						quoridor.movePlayersPawn(squareCoord);
 						checkEndGame();
 						activateState();
-						updateBoardDisplay();
 						updateButtons();
-						break;
+						return true;
 					}
 				}
 			}
 			break;
 		}
+		return false;
 	}
 	
 	public void checkEndGame(){
-		int playersTurn = quoridor.getPlayersTurn();
-		switch (playersTurn){
-		case 0:
-			if (quoridor.getPlayers()[playersTurn].getPawnLocation().getY() == 0){
+		if (quoridor.checkFinish(quoridor.getPlayersTurn(), quoridor.getPlayers()[quoridor.getPlayersTurn()].getPawnLocation()) == true){
 				currentState = GameState.GameEnded;
-			}
-		break;
-		case 1:
-			if (quoridor.getPlayers()[playersTurn].getPawnLocation().getY() == 16){
-				currentState = GameState.GameEnded;
-			}
-		break;
-		case 2:
-			if (quoridor.getPlayers()[playersTurn].getPawnLocation().getX() == 16){
-				currentState = GameState.GameEnded;
-			}
-		break;
-		case 3:
-			if (quoridor.getPlayers()[playersTurn].getPawnLocation().getX() == 0){
-				currentState = GameState.GameEnded;
-			}
-		break;
 		}
 	}
 

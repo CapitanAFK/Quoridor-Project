@@ -1,7 +1,10 @@
 package gameplay;
 
-import java.awt.Color;
+import gui.GameView.GameState;
+
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.Random;
 
 import model.*;
@@ -12,6 +15,7 @@ public class Quoridor {
 	private ModelFacade models;
 	private Rules rules;
 	private int playersTurn;
+	private Integer[][] grid = new Integer[17][17];
 	
 	public Quoridor(Rules rules){
 		this.rules = rules;
@@ -103,6 +107,134 @@ public class Quoridor {
 		validMoves.addAll(getDirectionalValidMoves(playerPos, "south"));
 		validMoves.addAll(getDirectionalValidMoves(playerPos, "west"));
 		return validMoves;
+	}
+	
+	public boolean checkClosedCircuit(Coordinate wallCoord, boolean isHorizontal){
+		Deque<Coordinate> stack = new ArrayDeque<Coordinate>(); 
+		Coordinate pos = new Coordinate(0, 0);
+		boolean done = false;
+		boolean failed = false;
+		for (int i = 0; i < rules.MAX_PLAYERS; i++) {
+			updateGrid(wallCoord, isHorizontal);
+			stack = new ArrayDeque<Coordinate>(); 
+			stack.push(getPlayers()[i].getPawnLocation());
+			done = false;
+			failed = false;
+			while (done == false && failed == false){
+				if (stack.size() > 0){
+					pos = stack.pop();
+				} else if (stack.size() == 0) {
+					failed = true;
+				}
+				if (failed == false){
+					//System.out.println(gridToString());
+					if (grid[pos.getX()][pos.getY()] == 0){
+						grid[pos.getX()][pos.getY()] = 1;
+					} else if (grid[pos.getX()][pos.getY()] == 2){
+						grid[pos.getX()][pos.getY()] = 3;
+					}
+					if (checkFinish(i, pos) == true){
+						done = true;
+					} else {
+						if (validCoord(pos.getWall("north"))) {
+							stack.push(pos.getWall("north"));
+						}
+						if (validCoord(pos.getWall("east"))) {
+							stack.push(pos.getWall("east"));
+						}
+						if (validCoord(pos.getWall("south"))) {
+							stack.push(pos.getWall("south"));
+						}
+						if (validCoord(pos.getWall("west"))) {
+							stack.push(pos.getWall("west"));
+						}
+					}
+				}
+			}
+		}
+		return done;
+	}
+	
+	public boolean validCoord(Coordinate coord){
+		if (inBounds(coord) == true){
+			if (grid[coord.getX()][coord.getY()] != 1 &&
+				grid[coord.getX()][coord.getY()] != 3 &&
+				grid[coord.getX()][coord.getY()] != 4 &&
+				grid[coord.getX()][coord.getY()] != 5){
+				return true;
+			} else {
+				return false;
+			}
+		}else {
+			return false;
+		}
+	}
+	
+	public void updateGrid(Coordinate wallCoord, boolean isHorizontal){
+		for (int x = 0; x < 17; x++) {
+			for (int y = 0; y < 17; y++) {
+				BoardLocation boardLoc = getBoard().getBoardLocation(new Coordinate(x,y));
+				if (boardLoc == BoardLocation.FREE_GAP){
+					grid[x][y] = 2;
+				} else if (boardLoc == BoardLocation.USED_GAP){
+					grid[x][y] = 4;
+				} else if (boardLoc == BoardLocation.FREE_WALLGAP ||
+							boardLoc == BoardLocation.USED_WALLGAP){
+					grid[x][y] = 5;
+				} else {
+					grid[x][y] = 0;
+				}
+			}
+		}
+		grid[wallCoord.getX()][wallCoord.getY()] = 5;
+		if (isHorizontal == true){
+			grid[wallCoord.getWall("east").getX()][wallCoord.getY()] = 4;
+			grid[wallCoord.getWall("west").getX()][wallCoord.getY()] = 4;
+		} else {
+			grid[wallCoord.getX()][wallCoord.getWall("north").getY()] = 4;
+			grid[wallCoord.getX()][wallCoord.getWall("south").getY()] = 4;
+		}
+	}
+	
+	public String gridToString(){
+		StringBuilder sb = new StringBuilder();
+		for (int x = 0; x < 17; x++) {
+			sb.append("[");
+			for (int y = 0; y < 17; y++) {
+				sb.append(grid[x][y].toString()+" ");
+				if (y == 16){
+					sb.append("] \n");
+				}
+			}
+		}
+		return sb.toString();
+	}
+	
+	public boolean checkFinish(int playersTurn, Coordinate coord){
+		boolean result = false;
+		switch (playersTurn){
+		case 0:
+			if (coord.getY() == 0){
+				result = true;
+			}
+		break;
+		case 1:
+			if (coord.getY() == 16){
+				result = true;
+			}
+		break;
+		case 2:
+			if (coord.getX() == 16){
+				result = true;
+			}
+		break;
+		case 3:
+			if (coord.getX() == 0){
+				result = true;
+			}
+		break;
+		}
+		return result;
 	}
 	
 	public ArrayList<Coordinate> getDirectionalValidMoves(Coordinate playerPos, String direction){
@@ -206,24 +338,25 @@ public class Quoridor {
 	 * @param isHorizontal - determines whether Wall to be placed is horizontal or vertical
 	 */
 	public String addPlayerWall(Coordinate boardCoord, boolean isHorizontal){
-		//checks if board location is a WallGap
-		if (models.getBoard().getBoardLocation(boardCoord) == BoardLocation.FREE_WALLGAP){
-			//checks if Wall fits in BoardLocations and if WallGap is available
-			if (models.getBoard().checkWallFits(boardCoord, isHorizontal) == true){
-				//updates players walls placed
-				if (models.getPlayers()[playersTurn].placeWall(boardCoord, isHorizontal) == false){
-					return "Player Has Used All Their Walls!";
+		if (checkClosedCircuit(boardCoord, isHorizontal) == true){
+			//checks if board location is a WallGap
+			if (models.getBoard().getBoardLocation(boardCoord) == BoardLocation.FREE_WALLGAP){
+				//checks if Wall fits in BoardLocations and if WallGap is available
+				if (models.getBoard().checkWallFits(boardCoord, isHorizontal) == true){
+					//updates players walls placed
+					if (models.getPlayers()[playersTurn].placeWall(boardCoord, isHorizontal) == false){
+						return "Player Has Used All Their Walls!";
+					}
+					//updates available gaps on board and adds wall to WallGap
+					models.getBoard().updateGapAvailabilty(boardCoord, isHorizontal);
+					return "Wall Placed";
+				} else {
+					return "No Room For Wall";
 				}
-				//updates available gaps on board and adds wall to WallGap
-				models.getBoard().updateGapAvailabilty(boardCoord, isHorizontal);
-				return "Wall Placed";
-			} else {
-				return "No Room For Wall";
+				
 			}
-			
-		} else {
-			return "Invalid Move";
 		}
+		return "Invalid Move";
 	}
 	
 	public void removePlayerWall(Coordinate boardCoord){

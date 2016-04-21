@@ -9,27 +9,20 @@ public class Controls {
 	
 	//Class that interacts with the in game objects like moving pawns and placing walls
 	//OPTIONAL allow the user to change keyBindings
-	public String moveLeft = "a";
-	public String moveRight = "d";
-	public String moveUp = "w";
-	public String moveDown = "s";
-	public String horizontalWall = "h";
-	public String verticalWall = "v";
-	public String undo = "z";
-	public String endTurn = "m";
+	public String moveLeft = "A";
+	public String moveRight = "D";
+	public String moveUp = "W";
+	public String moveDown = "S";
+	public String horizontalWall = "H";
+	public String verticalWall = "V";
+	public String undo = "Z";
+	public String endTurn = "M";
 	
 	public Controls(){
-		setKeys("textFiles/controls/left.txt", "left");
-		setKeys("textFiles/controls/right.txt", "right");
-		setKeys("textFiles/controls/up.txt", "up");
-		setKeys("textFiles/controls/down.txt", "down");
-		setKeys("textFiles/controls/hor.txt", "hor");
-		setKeys("textFiles/controls/ver.txt", "ver");
-		setKeys("textFiles/controls/undo.txt", "undo");
-		setKeys("textFiles/controls/endTurn.txt", "endTurn");
+		getKeysFromFile("textFiles/controls.txt");
 	}
 	
-	public void setKeys(String file, String key){
+	public void getKeysFromFile(String file){
 		// This will reference one line at a time
 		String line = null;
 		
@@ -41,23 +34,35 @@ public class Controls {
 			// Wrap FileReader in BufferedReader
 			BufferedReader br = new BufferedReader(fr);	
 			
-			if((line = br.readLine()) != null){
-				if(key == "left"){
+			int x = 0;
+			
+			while ((line = br.readLine()) != null ){
+				x++;
+				switch (x){
+				case 1:
 					moveLeft = line;
-				} else if(key == "right"){
+					break;
+				case 2:
 					moveRight = line;
-				} else if(key == "up"){
+					break;
+				case 3:
 					moveUp = line;
-				} else if(key == "down"){
+					break;
+				case 4:
 					moveDown = line;
-				} else if(key == "hor"){
+					break;
+				case 5:
 					horizontalWall = line;
-				} else if(key == "ver"){
+					break;
+				case 6:
 					verticalWall = line;
-				} else if(key == "undo"){
+					break;
+				case 7:
 					undo = line;
-				} else if(key == "endTurn"){
+					break;
+				case 8:
 					endTurn = line;
+					break;
 				}
 			}
 			
@@ -109,5 +114,37 @@ public class Controls {
 	
 	public String getEndTurn(){
 		return endTurn;
+	}
+
+	public void setMoveLeft(String moveLeft) {
+		this.moveLeft = moveLeft;
+	}
+
+	public void setMoveRight(String moveRight) {
+		this.moveRight = moveRight;
+	}
+
+	public void setMoveUp(String moveUp) {
+		this.moveUp = moveUp;
+	}
+
+	public void setMoveDown(String moveDown) {
+		this.moveDown = moveDown;
+	}
+
+	public void setHorizontalWall(String horizontalWall) {
+		this.horizontalWall = horizontalWall;
+	}
+
+	public void setVerticalWall(String verticalWall) {
+		this.verticalWall = verticalWall;
+	}
+
+	public void setUndo(String undo) {
+		this.undo = undo;
+	}
+
+	public void setEndTurn(String endTurn) {
+		this.endTurn = endTurn;
 	}
 }

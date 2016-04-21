@@ -73,14 +73,7 @@ public class KeyBindingsView implements ViewPanel {
 		backButton.setMaximumSize(new Dimension(Short.MAX_VALUE,
 				Short.MAX_VALUE));
 
-		upButton.setText(controls.getUp());
-		downButton.setText(controls.getDown());
-		leftButton.setText(controls.getLeft());
-		rightButton.setText(controls.getRight());
-		veritcalButton.setText(controls.getVerticalWall());
-		horizontalButton.setText(controls.getHorizontalWall());
-		undoButton.setText(controls.getUndo());
-		endTurnButton.setText(controls.getEndTurn());
+		updateButtons();
 
 		// Create containers to hold the components
 		JPanel buttonPanel = new JPanel();
@@ -246,98 +239,72 @@ public class KeyBindingsView implements ViewPanel {
 			
 			@Override
 			public boolean dispatchKeyEvent(KeyEvent e) {
-					switch(e.getID()){
-					case KeyEvent.KEY_PRESSED:
+					if (e.getID() == KeyEvent.KEY_PRESSED){
 						keyCode = e.getKeyCode();
 						key = (char)keyCode;
-	                   	keyPressed = "" + key;
-	                   	PrintWriter writer;	                   	
-	                   	
-	                   	if(keyToChange == "left"){
-							try {
-								writer = new PrintWriter("textFiles/controls/left.txt");
-								writer.print(keyPressed);
-								writer.close();
-								controls.setKeys("textFiles/controls/left.txt", "left");
-								leftButton.setText(controls.getLeft());
-							} catch (FileNotFoundException ex) {
-								System.out.println("File not found.");
-							}
-	                   	} else if(keyToChange == "right"){
-							try {
-								writer = new PrintWriter("textFiles/controls/right.txt");
-								writer.print(keyPressed);
-								writer.close();
-								controls.setKeys("textFiles/controls/right.txt", "right");
-								rightButton.setText(controls.getRight());
-							} catch (FileNotFoundException ex) {
-								System.out.println("File not found.");
-							}
-	                   	} else if(keyToChange == "up"){
-							try {
-								writer = new PrintWriter("textFiles/controls/up.txt");
-								writer.print(keyPressed);
-								writer.close();
-								controls.setKeys("textFiles/controls/up.txt", "up");
-								upButton.setText(controls.getUp());
-							} catch (FileNotFoundException ex) {
-								System.out.println("File not found.");
-							}
-	                   	} else if(keyToChange == "down"){
-							try {
-								writer = new PrintWriter("textFiles/controls/down.txt");
-								writer.print(keyPressed);
-								writer.close();
-								controls.setKeys("textFiles/controls/down.txt", "down");
-								downButton.setText(controls.getDown());
-							} catch (FileNotFoundException ex) {
-								System.out.println("File not found.");
-							}
-	                   	} else if(keyToChange == "ver"){
-							try {
-								writer = new PrintWriter("textFiles/controls/ver.txt");
-								writer.print(keyPressed);
-								writer.close();
-								controls.setKeys("textFiles/controls/ver.txt", "ver");
-								veritcalButton.setText(controls.getVerticalWall());
-							} catch (FileNotFoundException ex) {
-								System.out.println("File not found.");
-							}
-	                   	} else if(keyToChange == "hor"){
-							try {
-								writer = new PrintWriter("textFiles/controls/hor.txt");
-								writer.print(keyPressed);
-								writer.close();
-								controls.setKeys("textFiles/controls/hor.txt", "hor");
-								horizontalButton.setText(controls.getHorizontalWall());
-							} catch (FileNotFoundException ex) {
-								System.out.println("File not found.");
-							}
-	                   	} else if(keyToChange == "undo"){
-							try {
-								writer = new PrintWriter("textFiles/controls/undo.txt");
-								writer.print(keyPressed);
-								writer.close();
-								controls.setKeys("textFiles/controls/undo.txt", "undo");
-								undoButton.setText(controls.getUndo());
-							} catch (FileNotFoundException ex) {
-								System.out.println("File not found.");
-							}
-	                   	} else if(keyToChange == "endTurn"){
-							try {
-								writer = new PrintWriter("textFiles/controls/endTurn.txt");
-								writer.print(keyPressed);
-								writer.close();
-								controls.setKeys("textFiles/controls/endTurn.txt", "endTurn");
-								endTurnButton.setText(controls.getEndTurn());
-							} catch (FileNotFoundException ex) {
-								System.out.println("File not found.");
-							}
-	                   	} 
-				}
+	                   	keyPressed = "" + key;   
+	                   	switch(keyToChange){
+	                   	case "left":
+	                   		controls.setMoveLeft(keyPressed);
+	                   		break;
+	                   	case "right":
+	                   		controls.setMoveRight(keyPressed);
+	                   		break;
+	                   	case "up":
+	                   		controls.setMoveUp(keyPressed);
+	                   		break;
+	                   	case "down":
+	                   		controls.setMoveDown(keyPressed);
+	                   		break;
+	                   	case "ver":
+	                   		controls.setVerticalWall(keyPressed);
+	                   		break;
+	                   	case "hor":
+	                   		controls.setHorizontalWall(keyPressed);
+	                   		break;
+	                   	case "undo":
+	                   		controls.setUndo(keyPressed);
+	                   		break;
+	                   	case "endTurn":
+	                   		controls.setEndTurn(keyPressed);
+	                   		break;
+	                   	}
+					}
+					updateControlsFile();
+					updateButtons();
 				return false;
 			}
     	 
     	});
     }	
+	
+	public void updateControlsFile(){
+		PrintWriter writer;	
+		try {
+			writer = new PrintWriter("textFiles/controls.txt");
+			writer.println(controls.getLeft());
+			writer.println(controls.getRight());
+			writer.println(controls.getUp());
+			writer.println(controls.getDown());
+			writer.println(controls.getVerticalWall());
+			writer.println(controls.getHorizontalWall());
+			writer.println(controls.getUndo());
+			writer.println(controls.getEndTurn());
+			writer.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void updateButtons(){
+		upButton.setText(controls.getUp());
+		downButton.setText(controls.getDown());
+		leftButton.setText(controls.getLeft());
+		rightButton.setText(controls.getRight());
+		veritcalButton.setText(controls.getVerticalWall());
+		horizontalButton.setText(controls.getHorizontalWall());
+		undoButton.setText(controls.getUndo());
+		endTurnButton.setText(controls.getEndTurn());
+	}
 }
