@@ -15,6 +15,7 @@ import java.util.ResourceBundle;
 //	a. language.addActionListener(); add to the if statement
 //  b. updateComboBoxView(); add to the if statement
 //  c. add to languages array
+// 4. Add images
 
 /**
  * Class responsible for detecting the current language
@@ -86,6 +87,10 @@ public class Language {
 			country = "PL";
 		} else if (language.equals("zu")) {
 			country = "ZU";
+		} else if (language.equals("af")) {
+			country = "AF";
+		} else if (language.equals("xh")) {
+			country = "XH";
 		}
 	}
 

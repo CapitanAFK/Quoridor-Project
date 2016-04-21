@@ -29,7 +29,7 @@ public class OptionsView implements ViewPanel {
 		final int blankSpace = 200;  // Blank border at the edges of the panel
 		
 		//Options for the JComboBoxes
-		String[] languages = {"English", "Polski", "Zulu"};
+		String[] languages = {"English", "Polski", "Zulu", "Afrikaans", "Xhosa"};
 		
 		// Create the components
 		ImageIcon headerImage = new ImageIcon(messages.getString("options_title"));
@@ -108,12 +108,23 @@ public class OptionsView implements ViewPanel {
 						writer.print("pl");
 					} else if(language.getSelectedItem() == "Zulu"){
 						writer.print("zu");
+					} else if(language.getSelectedItem() == "Afrikaans"){
+						writer.print("af");
+					} else if(language.getSelectedItem() == "Xhosa"){
+						writer.print("xh");
 					}
 					writer.close();
 				} catch (FileNotFoundException e1) {
 					System.out.println("No file found.");
 				}
 				updateComboBoxView();
+				
+				// Reload the screen
+				panel.setVisible(false);
+				OptionsView op = new OptionsView();
+				op.addToJFrame();
+				op.setVisible();
+				
 			}
 		});
 	}
@@ -127,6 +138,10 @@ public class OptionsView implements ViewPanel {
 			language.setSelectedItem("Polski");
 		} else if(tmpLng.equals("zu")) {
 			language.setSelectedItem("Zulu");
+		} else if(tmpLng.equals("af")) {
+			language.setSelectedItem("Afrikaans");
+		} else if(tmpLng.equals("xh")) {
+			language.setSelectedItem("Xhosa");
 		}
 	}
 	
