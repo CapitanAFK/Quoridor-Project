@@ -20,48 +20,48 @@ public class Quoridor {
 	private Integer[][] grid = new Integer[17][17];
 	private Language currentLanguage;
 	private ResourceBundle messages;
-	
+
 	public Quoridor(Rules rules){
 		this.rules = rules;
 		models = new ModelFacade();
 		currentLanguage = new Language();
 		messages = currentLanguage.getMessages();
 	}
-	
+
 	public void beginGame(){
 		initialisePlayers();
 		models.setBoard(new Board());
 		models.getBoard().initialiseBoard();
 		determineWhoStarts();
 	}
-	
+
 	public Player[] getPlayers(){
 		return models.getPlayers();
 	}
-	
+
 	public Board getBoard(){
 		return models.getBoard();
 	}
-	
+
 	public Rules getRules(){
 		return rules;
 	}
-	
+
 	public int getPlayersTurn(){
 		return playersTurn;
 	}
-	
+
 	public void endPlayersTurn(){
 		playersTurn++;
 		if (playersTurn > rules.MAX_PLAYERS-1){
 			playersTurn = 0;
 		}
 	}
-	
+
 	public int getPlayersWallsLeft(){
 		return getPlayers()[playersTurn].getWallsLeft();
 	}
-	
+
 	/**
 	 * randomly decides which of the players will start the game
 	 */
@@ -69,16 +69,17 @@ public class Quoridor {
 		Random random = new Random();
 		playersTurn = random.nextInt(rules.MAX_PLAYERS);
 	}
-	
+
 	/**
 	 * creates the Player objects in the players array with their specified colours
 	 */
 	public void initialisePlayers(){
 		String[] playerColours = rules.getPlayerColours();
+		String[] playerNames = rules.getPlayerNames();
 		models.setPlayers(new Player[rules.MAX_PLAYERS]);
 		if (rules.getGameRules() == messages.getString("normal_rules")){
 			for (int i = 0; i < rules.MAX_PLAYERS; i++) {
-				models.getPlayers()[i] = new Player(rules.MAX_WALLS, playerColours[i]);
+				models.getPlayers()[i] = new Player(rules.MAX_WALLS, playerColours[i], playerNames[i]);
 				switch (i){
 				case 0: models.getPlayers()[i].getPawn().setPosition(new Coordinate(8,16));
 				break;
@@ -92,7 +93,7 @@ public class Quoridor {
 			}
 		} else {
 			for (int i = 0; i < rules.MAX_PLAYERS; i++) {
-				models.getPlayers()[i] = new Player(rules.MAX_WALLS, playerColours[i]);
+				models.getPlayers()[i] = new Player(rules.MAX_WALLS, playerColours[i], playerNames[i]);
 				switch (i){
 				case 0: models.getPlayers()[i].getPawn().setPosition(new Coordinate(16,16));
 				break;
@@ -106,7 +107,7 @@ public class Quoridor {
 			}
 		}
 	}
-	
+
 	/**
 	 * moves the specified Player's Pawn to the specified BoardLocation
 	 * updates any board locations which may be relevant
@@ -124,7 +125,7 @@ public class Quoridor {
 		models.getPlayers()[playersTurn].movePawn(boardCoord);
 		return true;
 	}
-	
+
 	public ArrayList<Coordinate> getValidMoves(){
 		ArrayList<Coordinate> validMoves = new ArrayList<Coordinate>();
 		Coordinate playerPos = getPlayers()[getPlayersTurn()].getPawnLocation();
@@ -134,49 +135,14 @@ public class Quoridor {
 		validMoves.addAll(getDirectionalValidMoves(playerPos, "west"));
 		return validMoves;
 	}
-	
+
 	public boolean checkClosedCircuit(Coordinate wallCoord, boolean isHorizontal){
 		Deque<Coordinate> stack = new ArrayDeque<Coordinate>(); 
-		Coordinate pos = new Coordinate(0, 0);
 		int sucesses = 0;
-		boolean done = false;
-		boolean failed = false;
 		for (int i = 0; i < rules.MAX_PLAYERS; i++) {
-			updateGrid(wallCoord, isHorizontal);
-			stack = new ArrayDeque<Coordinate>(); 
-			stack.push(getPlayers()[i].getPawnLocation());
-			done = false;
-			failed = false;
-			while (done == false && failed == false){
-				if (stack.size() > 0){
-					pos = stack.pop();
-				} else if (stack.size() == 0) {
-					failed = true;
-				}
-				if (failed == false){
-					if (grid[pos.getX()][pos.getY()] == 0){
-						grid[pos.getX()][pos.getY()] = 1;
-					} else if (grid[pos.getX()][pos.getY()] == 2){
-						grid[pos.getX()][pos.getY()] = 3;
-					}
-					if (checkFinish(i, pos) == true){
-						done = true;
-						sucesses++;
-					} else {
-						if (validCoord(pos.getWall("north"))) {
-							stack.push(pos.getWall("north"));
-						}
-						if (validCoord(pos.getWall("east"))) {
-							stack.push(pos.getWall("east"));
-						}
-						if (validCoord(pos.getWall("south"))) {
-							stack.push(pos.getWall("south"));
-						}
-						if (validCoord(pos.getWall("west"))) {
-							stack.push(pos.getWall("west"));
-						}
-					}
-				}
+			stack = checkPlayerRoute(i, wallCoord,isHorizontal);
+			if (stack.size() > 0){
+				sucesses++;
 			}
 		}
 		if (sucesses == rules.MAX_PLAYERS){
@@ -185,13 +151,51 @@ public class Quoridor {
 			return false;
 		}
 	}
-	
+
+	public Deque<Coordinate> checkPlayerRoute(int player, Coordinate wallCoord, boolean isHorizontal){
+		Deque<Coordinate> stack = new ArrayDeque<Coordinate>(); 
+		Coordinate pos = new Coordinate(0, 0);
+		boolean done = false;
+		boolean failed = false;
+		updateGrid(wallCoord, isHorizontal);
+		stack = new ArrayDeque<Coordinate>(); 
+		stack.push(getPlayers()[player].getPawnLocation());
+		done = false;
+		failed = false;
+		while (done == false && failed == false){
+			if (stack.size() > 0){
+				pos = stack.pop();
+			} else if (stack.size() == 0) {
+				failed = true;
+			}
+			if (failed == false){
+				grid[pos.getX()][pos.getY()] = 1;
+				if (checkFinish(player, pos) == true){
+					done = true;
+				} else {
+					if (validCoord(pos.getWall("north"))) {
+						stack.push(pos.getWall("north"));
+					}
+					if (validCoord(pos.getWall("east"))) {
+						stack.push(pos.getWall("east"));
+					}
+					if (validCoord(pos.getWall("south"))) {
+						stack.push(pos.getWall("south"));
+					}
+					if (validCoord(pos.getWall("west"))) {
+						stack.push(pos.getWall("west"));
+					}
+				}
+			}
+		}
+		System.out.println(gridToString());
+		return stack;
+	}
+
 	public boolean validCoord(Coordinate coord){
 		if (inBounds(coord) == true){
 			if (grid[coord.getX()][coord.getY()] != 1 &&
-				grid[coord.getX()][coord.getY()] != 3 &&
-				grid[coord.getX()][coord.getY()] != 4 &&
-				grid[coord.getX()][coord.getY()] != 5){
+				grid[coord.getX()][coord.getY()] != 2){
 				return true;
 			} else {
 				return false;
@@ -200,33 +204,31 @@ public class Quoridor {
 			return false;
 		}
 	}
-	
+
 	public void updateGrid(Coordinate wallCoord, boolean isHorizontal){
 		for (int x = 0; x < 17; x++) {
 			for (int y = 0; y < 17; y++) {
 				BoardLocation boardLoc = getBoard().getBoardLocation(new Coordinate(x,y));
-				if (boardLoc == BoardLocation.FREE_GAP){
+				if (boardLoc == BoardLocation.USED_GAP ||
+					boardLoc == BoardLocation.FREE_WALLGAP ||
+					boardLoc == BoardLocation.USED_WALLGAP ||
+					boardLoc == BoardLocation.USED_GAP){
 					grid[x][y] = 2;
-				} else if (boardLoc == BoardLocation.USED_GAP){
-					grid[x][y] = 4;
-				} else if (boardLoc == BoardLocation.FREE_WALLGAP ||
-							boardLoc == BoardLocation.USED_WALLGAP){
-					grid[x][y] = 5;
 				} else {
 					grid[x][y] = 0;
 				}
 			}
 		}
-		grid[wallCoord.getX()][wallCoord.getY()] = 5;
+		grid[wallCoord.getX()][wallCoord.getY()] = 2;
 		if (isHorizontal == true){
-			grid[wallCoord.getWall("east").getX()][wallCoord.getY()] = 4;
-			grid[wallCoord.getWall("west").getX()][wallCoord.getY()] = 4;
+			grid[wallCoord.getWall("east").getX()][wallCoord.getY()] = 2;
+			grid[wallCoord.getWall("west").getX()][wallCoord.getY()] = 2;
 		} else {
-			grid[wallCoord.getX()][wallCoord.getWall("north").getY()] = 4;
-			grid[wallCoord.getX()][wallCoord.getWall("south").getY()] = 4;
+			grid[wallCoord.getX()][wallCoord.getWall("north").getY()] = 2;
+			grid[wallCoord.getX()][wallCoord.getWall("south").getY()] = 2;
 		}
 	}
-	
+
 	public String gridToString(){
 		StringBuilder sb = new StringBuilder();
 		for (int x = 0; x < 17; x++) {
@@ -238,142 +240,143 @@ public class Quoridor {
 				}
 			}
 		}
+		sb.append("\n");
 		return sb.toString();
 	}
-	
+
 	public boolean checkFinish(int playersTurn, Coordinate coord){
 		boolean result = false;
 		if (rules.getGameRules() == messages.getString("normal_rules")){
-		switch (playersTurn){
-		case 0:
-			if (coord.getY() == 0){
-				result = true;
+			switch (playersTurn){
+			case 0:
+				if (coord.getY() == 0){
+					result = true;
+				}
+				break;
+			case 1:
+				if (coord.getY() == 16){
+					result = true;
+				}
+				break;
+			case 2:
+				if (coord.getX() == 16){
+					result = true;
+				}
+				break;
+			case 3:
+				if (coord.getX() == 0){
+					result = true;
+				}
+				break;
 			}
-		break;
-		case 1:
-			if (coord.getY() == 16){
-				result = true;
-			}
-		break;
-		case 2:
-			if (coord.getX() == 16){
-				result = true;
-			}
-		break;
-		case 3:
-			if (coord.getX() == 0){
-				result = true;
-			}
-		break;
-		}
 		} else {
 			switch (playersTurn){
 			case 0:
 				if (coord.compare(new Coordinate(0,0))){
 					result = true;
 				}
-			break;
+				break;
 			case 1:
 				if (coord.compare(new Coordinate(16,16))){
 					result = true;
 				}
-			break;
+				break;
 			case 2:
 				if (coord.compare(new Coordinate(16,0))){
 					result = true;
 				}
-			break;
+				break;
 			case 3:
 				if (coord.compare(new Coordinate(0,16))){
 					result = true;
 				}
-			break;
+				break;
 			}
 		}
 		return result;
 	}
-	
+
 	public ArrayList<Coordinate> getDirectionalValidMoves(Coordinate playerPos, String direction){
 		ArrayList<Coordinate> validMoves = new ArrayList<Coordinate>();
 		if (inBounds(playerPos.getSquare(direction))){
-			
+
 			if (checkFreeSquare(playerPos.getSquare(direction)) &&
-				checkFreeGap(playerPos.getWall(direction))){
-				
+					checkFreeGap(playerPos.getWall(direction))){
+
 				validMoves.add(playerPos.getSquare(direction));
-				
+
 			} else if (inBounds(playerPos.getSquare(direction).getSquare(direction))){
-				
+
 				if (checkFreeGap((playerPos.getWall(direction)))&&
-					checkFreeSquare(playerPos.getSquare(direction).getSquare(direction)) && 
-					checkFreeGap(playerPos.getSquare(direction).getWall(direction))){
-					
+						checkFreeSquare(playerPos.getSquare(direction).getSquare(direction)) && 
+						checkFreeGap(playerPos.getSquare(direction).getWall(direction))){
+
 					validMoves.add(playerPos.getSquare(direction).getSquare(direction));
-					
+
 				} else if ( checkFreeGap(playerPos.getWall(direction)) &&
-							checkFreeSquare(playerPos.getSquare(direction).getSquare(direction)) && 
-							!checkFreeGap(playerPos.getSquare(direction).getWall(direction))){
-					
+						checkFreeSquare(playerPos.getSquare(direction).getSquare(direction)) && 
+						!checkFreeGap(playerPos.getSquare(direction).getWall(direction))){
+
 					if (direction == "north" || direction == "south"){
 						if (inBounds(playerPos.getSquare(direction).getSquare("east"))){
 							if (checkFreeSquare(playerPos.getSquare(direction).getSquare("east"))&&
-								checkFreeGap(playerPos.getSquare(direction).getWall("east"))){
+									checkFreeGap(playerPos.getSquare(direction).getWall("east"))){
 								validMoves.add(playerPos.getSquare(direction).getSquare("east"));
 							}
 						}
 						if (inBounds(playerPos.getSquare(direction).getSquare("west"))){
 							if (checkFreeSquare(playerPos.getSquare(direction).getSquare("west"))&&
-								checkFreeGap(playerPos.getSquare(direction).getWall("west"))){
+									checkFreeGap(playerPos.getSquare(direction).getWall("west"))){
 								validMoves.add(playerPos.getSquare(direction).getSquare("west"));
 							}
 						}
 					} else {
 						if (inBounds(playerPos.getSquare(direction).getSquare("north"))){
 							if (checkFreeSquare(playerPos.getSquare(direction).getSquare("north")) &&
-								checkFreeGap(playerPos.getSquare(direction).getWall("north"))){
+									checkFreeGap(playerPos.getSquare(direction).getWall("north"))){
 								validMoves.add(playerPos.getSquare(direction).getSquare("north"));
 							}
 						}
 						if (inBounds(playerPos.getSquare(direction).getSquare("south"))){
 							if (checkFreeSquare(playerPos.getSquare(direction).getSquare("south")) &&
-								checkFreeGap(playerPos.getSquare(direction).getWall("south"))){
+									checkFreeGap(playerPos.getSquare(direction).getWall("south"))){
 								validMoves.add(playerPos.getSquare(direction).getSquare("south"));
 							}
 						}
 					}
 				}
 			}
-			
+
 		}
 		return validMoves;
 	}
-	
+
 	public boolean checkFreeSquare(Coordinate coord){
 		return models.getBoard().getBoardLocation(coord) == BoardLocation.FREE_SQUARE;
 	}
-	
+
 	public boolean checkFreeGap(Coordinate coord){
 		return models.getBoard().getBoardLocation(coord) == BoardLocation.FREE_GAP;
 	}
-	
+
 	public boolean checkFreeWallGap(Coordinate coord, boolean isHorizontal){
 		boolean isFree = false;
 		if (isHorizontal == true){
 			if (models.getBoard().getBoardLocation(coord) == BoardLocation.FREE_WALLGAP &&
-				checkFreeGap(coord.getWall("east")) &&
-				checkFreeGap(coord.getWall("west"))){
+					checkFreeGap(coord.getWall("east")) &&
+					checkFreeGap(coord.getWall("west"))){
 				isFree = true;
 			}
 		} else {
 			if (models.getBoard().getBoardLocation(coord) == BoardLocation.FREE_WALLGAP &&
-				checkFreeGap(coord.getWall("north")) &&
-				checkFreeGap(coord.getWall("south"))){
+					checkFreeGap(coord.getWall("north")) &&
+					checkFreeGap(coord.getWall("south"))){
 				isFree = true;
 			}
 		}
 		return isFree;
 	}
-	
+
 	public boolean inBounds(Coordinate coord){
 		boolean inBounds = true;
 		if (coord.getX() < 0 || coord.getX() > 16){
@@ -384,7 +387,7 @@ public class Quoridor {
 		}
 		return inBounds;
 	}	
-	
+
 	/**
 	 * adds the specified Player's Wall to the specified BoardLocation
 	 * updates any board locations which may be relevant
@@ -408,12 +411,12 @@ public class Quoridor {
 				} else {
 					return "No Room For Wall";
 				}
-				
+
 			}
 		}
 		return "Invalid Move";
 	}
-	
+
 	public String removePlayerWall(Coordinate boardCoord, boolean isUndo){
 		boolean success = false;
 		boolean isHorizontal = true;

@@ -911,13 +911,13 @@ public class GameView implements ViewPanel {
 
 	public Image getPlayersImage(int player) {
 		switch (quoridor.getPlayers()[player].getPawn().getColour()) {
-		case "red":
+		case "Red":
 			return redPawnIMG;
-		case "blue":
+		case "Blue":
 			return bluePawnIMG;
-		case "green":
+		case "Green":
 			return greenPawnIMG;
-		case "yellow":
+		case "Yellow":
 			return yellowPawnIMG;
 		}
 		return null;
@@ -926,24 +926,24 @@ public class GameView implements ViewPanel {
 	public Image getPlayersWallImage(int player, boolean isHorizontal) {
 		if (isHorizontal){
 			switch (quoridor.getPlayers()[player].getPawn().getColour()) {
-			case "red":
+			case "Red":
 				return redHWallIMG;
-			case "blue":
+			case "Blue":
 				return blueHWallIMG;
-			case "green":
+			case "Green":
 				return greenHWallIMG;
-			case "yellow":
+			case "Yellow":
 				return yellowHWallIMG;
 			}
 		} else {
 			switch (quoridor.getPlayers()[player].getPawn().getColour()) {
-			case "red":
+			case "Red":
 				return redVWallIMG;
-			case "blue":
+			case "Blue":
 				return blueVWallIMG;
-			case "green":
+			case "Green":
 				return greenVWallIMG;
-			case "yellow":
+			case "Yellow":
 				return yellowVWallIMG;
 			}
 		}
