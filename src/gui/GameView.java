@@ -47,7 +47,7 @@ public class GameView implements ViewPanel {
 	private JLabel[][] boardWallGaps;
 
 	public static enum GameState {
-		PlacingVWall, PlacingHWall, RemovingWall, MovingPlayer, TurnTaken, GameEnded
+		BotsTurn, PlacingVWall, PlacingHWall, RemovingWall, MovingPlayer, TurnTaken, GameEnded
 	};
 
 	private GameState currentState;
@@ -82,7 +82,6 @@ public class GameView implements ViewPanel {
 		quoridor = new Quoridor(rules);
 		quoridor.beginGame();
 		turnTaken = null;
-		currentState = GameState.MovingPlayer;
 		// setup Images
 		try {
 			squareIMG = ImageIO.read(new File("Images/squares/Square.png"));
@@ -454,9 +453,7 @@ public class GameView implements ViewPanel {
 			}
 		});
 
-		updateBoardDisplay();
-		activateState();
-		updateButtons();
+		checkBotPlayer();
 	}
 
 	public void setWallGapsVisible(boolean visible) {
@@ -521,7 +518,7 @@ public class GameView implements ViewPanel {
 		switch (turnTaken.substring(0, 4)) {
 		case "Pawn":
 			coord = getCoordFromString();
-			quoridor.movePlayersPawn(coord);
+			quoridor.movePlayersPawn(quoridor.getPlayersTurn(),coord);
 			currentState = GameState.MovingPlayer;
 			break;
 		case "Vall":
@@ -569,10 +566,24 @@ public class GameView implements ViewPanel {
 
 	public void endPlayersTurn() {
 		quoridor.endPlayersTurn();
-		currentState = GameState.MovingPlayer;
 		turnTaken = null;
-		activateState();
-		updateButtons();
+		checkBotPlayer();
+	}
+	
+	public void checkBotPlayer(){
+		if (quoridor.checkBotsGo() == true){
+			currentState = GameState.BotsTurn;
+			quoridor.takeBotsTurn();
+			activateState();
+			updateButtons();
+			if (!checkEndGame()){
+				endPlayersTurn();
+			}
+		} else {
+			currentState = GameState.MovingPlayer;
+			activateState();
+			updateButtons();
+		}
 	}
 
 	public void updateButtons() {
@@ -591,6 +602,14 @@ public class GameView implements ViewPanel {
 			movePawn.setEnabled(false);
 			undoMove.setEnabled(true);
 			endTurn.setEnabled(true);
+			exitButton.setEnabled(true);
+		} else if (currentState == GameState.BotsTurn) {
+			vWall.setEnabled(false);
+			hWall.setEnabled(false);
+			removeWall.setEnabled(false);
+			movePawn.setEnabled(false);
+			undoMove.setEnabled(false);
+			endTurn.setEnabled(false);
 			exitButton.setEnabled(true);
 		} else {
 			vWall.setEnabled(true);
@@ -631,6 +650,9 @@ public class GameView implements ViewPanel {
 			setWallGapsVisible(true);
 			break;
 		case "TurnTaken":
+			setWallGapsVisible(false);
+			break;
+		case "BotsTurn":
 			setWallGapsVisible(false);
 			break;
 		}
@@ -757,7 +779,7 @@ public class GameView implements ViewPanel {
 								+ quoridor.getPlayers()[quoridor
 										.getPlayersTurn()].getPawnLocation()
 										.toString();
-						quoridor.movePlayersPawn(squareCoord);
+						quoridor.movePlayersPawn(quoridor.getPlayersTurn(), squareCoord);
 						checkEndGame();
 						activateState();
 						updateButtons();
@@ -770,11 +792,13 @@ public class GameView implements ViewPanel {
 		return false;
 	}
 
-	public void checkEndGame() {
+	public boolean checkEndGame() {
 		if (quoridor.checkFinish(quoridor.getPlayersTurn(), quoridor
 				.getPlayers()[quoridor.getPlayersTurn()].getPawnLocation()) == true) {
 			currentState = GameState.GameEnded;
+			return true;
 		}
+		return false;
 	}
 
 	public void updateBoardDisplay() {

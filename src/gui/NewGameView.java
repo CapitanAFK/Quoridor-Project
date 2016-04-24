@@ -268,7 +268,7 @@ public class NewGameView implements ViewPanel {
 		int wallCount = 0;
 		String[] colours = null;
 		String[] names = null;
-		ArrayList<Integer> botIDs = null;
+		ArrayList<Integer> botIDs = new ArrayList<Integer>();
 		switch(gameMode.getSelectedItem().toString().substring(0, 1)){
 		case "2":
 			playerCount = 2;
@@ -276,7 +276,7 @@ public class NewGameView implements ViewPanel {
 			colours = new String[]{playerColours[0].getSelectedItem().toString(), playerColours[1].getSelectedItem().toString()};
 			names = new String[]{playerNames[0].getText(), playerNames[1].getText()};
 			for (int i = 0; i < 2; i++) {
-				if (playerTypes[i].toString() == messages.getString("bot_player")){
+				if (playerTypes[i].getSelectedItem().toString().equals(messages.getString("bot_player"))){
 					botIDs.add(i);
 				}
 			}
@@ -287,7 +287,7 @@ public class NewGameView implements ViewPanel {
 			colours = new String[]{playerColours[0].getSelectedItem().toString(), playerColours[1].getSelectedItem().toString(), playerColours[2].getSelectedItem().toString(), playerColours[3].getSelectedItem().toString()};
 			names = new String[]{playerNames[0].getText(), playerNames[1].getText(), playerNames[2].getText(), playerNames[3].getText()};
 			for (int i = 0; i < 4; i++) {
-				if (playerTypes[i].toString() == messages.getString("bot_player")){
+				if (playerTypes[i].getSelectedItem().toString().equals(messages.getString("bot_player"))){
 					botIDs.add(i);
 				}
 			}

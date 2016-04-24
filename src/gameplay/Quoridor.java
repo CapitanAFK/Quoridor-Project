@@ -29,9 +29,9 @@ public class Quoridor {
 	}
 
 	public void beginGame(){
-		initialisePlayers();
 		models.setBoard(new Board());
 		models.getBoard().initialiseBoard();
+		initialisePlayers();
 		determineWhoStarts();
 	}
 
@@ -56,6 +56,16 @@ public class Quoridor {
 		if (playersTurn > rules.MAX_PLAYERS-1){
 			playersTurn = 0;
 		}
+
+	}
+
+	public boolean checkBotsGo(){
+		for (int i = 0; i < rules.getBotPlayerIDs().size(); i++) {
+			if (playersTurn == rules.getBotPlayerIDs().get(i)){		
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public int getPlayersWallsLeft(){
@@ -81,13 +91,13 @@ public class Quoridor {
 			for (int i = 0; i < rules.MAX_PLAYERS; i++) {
 				models.getPlayers()[i] = new Player(rules.MAX_WALLS, playerColours[i], playerNames[i]);
 				switch (i){
-				case 0: models.getPlayers()[i].getPawn().setPosition(new Coordinate(8,16));
+				case 0: movePlayersPawn(i, new Coordinate(8,16));
 				break;
-				case 1: models.getPlayers()[i].getPawn().setPosition(new Coordinate(8,0));
+				case 1: movePlayersPawn(i, new Coordinate(8,0));
 				break;
-				case 2: models.getPlayers()[i].getPawn().setPosition(new Coordinate(0,8));
+				case 2: movePlayersPawn(i, new Coordinate(0,8));
 				break;
-				case 3: models.getPlayers()[i].getPawn().setPosition(new Coordinate(16,8));
+				case 3: movePlayersPawn(i, new Coordinate(16,8));
 				break;
 				}
 			}
@@ -95,17 +105,82 @@ public class Quoridor {
 			for (int i = 0; i < rules.MAX_PLAYERS; i++) {
 				models.getPlayers()[i] = new Player(rules.MAX_WALLS, playerColours[i], playerNames[i]);
 				switch (i){
-				case 0: models.getPlayers()[i].getPawn().setPosition(new Coordinate(16,16));
+				case 0: movePlayersPawn(i, new Coordinate(16,16));
 				break;
-				case 1: models.getPlayers()[i].getPawn().setPosition(new Coordinate(0,0));
+				case 1: movePlayersPawn(i, new Coordinate(0,0));
 				break;
-				case 2: models.getPlayers()[i].getPawn().setPosition(new Coordinate(0,16));
+				case 2: movePlayersPawn(i, new Coordinate(0,16));
 				break;
-				case 3: models.getPlayers()[i].getPawn().setPosition(new Coordinate(16,0));
+				case 3: movePlayersPawn(i, new Coordinate(16,0));
 				break;
 				}
 			}
 		}
+	}
+
+	public void takeBotsTurn(){
+		ArrayList<Coordinate> route = new ArrayList<Coordinate>();
+		ArrayList<Coordinate> validMoves = new ArrayList<Coordinate>();
+		Random random = new Random();
+		int choice = random.nextInt(2);
+		if (choice == 1){
+			String wallAdded = "Invalid Move";
+			int distance = 0;
+			int playerToBlock = random.nextInt(rules.MAX_PLAYERS);
+			if (playerToBlock == playersTurn){
+				playerToBlock++;
+			}
+			if (playerToBlock >= rules.MAX_PLAYERS){
+				playerToBlock = 0;
+			}
+			route = getFastestPlayerRoute(playerToBlock);
+			while (wallAdded != "Wall Placed" && distance != route.size()-1){
+				distance++;
+				Coordinate newPos = route.get(distance);
+				if (route.get(distance-1).getSquare("north").compare(newPos)){
+					if (inBounds(route.get(distance-1).getWall("north").getWall("east"))){
+						wallAdded = addPlayerWall(playersTurn, route.get(distance-1).getWall("north").getWall("east"), true);
+					} else if (inBounds(route.get(distance-1).getWall("north").getWall("west"))){
+						wallAdded = addPlayerWall(playersTurn, route.get(distance-1).getWall("north").getWall("west"), true);
+					}
+					
+				} else if (route.get(distance-1).getSquare("south").compare(newPos)){
+					if (inBounds(route.get(distance-1).getWall("south").getWall("east"))){
+						wallAdded = addPlayerWall(playersTurn, route.get(distance-1).getWall("south").getWall("east"), true);
+					} else if (inBounds(route.get(distance-1).getWall("south").getWall("west"))){
+						wallAdded = addPlayerWall(playersTurn, route.get(distance-1).getWall("south").getWall("west"), true);
+					}
+					
+				} else if (route.get(distance-1).getSquare("east").compare(newPos)){
+					if (inBounds(route.get(distance-1).getWall("east").getWall("north"))){
+						wallAdded = addPlayerWall(playersTurn, route.get(distance-1).getWall("east").getWall("north"), false);
+					} else if (inBounds(route.get(distance-1).getWall("east").getWall("south"))){
+						wallAdded = addPlayerWall(playersTurn, route.get(distance-1).getWall("east").getWall("south"), false);
+					}
+				} else if (route.get(distance-1).getSquare("west").compare(newPos)){
+					if (inBounds(route.get(distance-1).getWall("west").getWall("north"))){
+						wallAdded = addPlayerWall(playersTurn, route.get(distance-1).getWall("west").getWall("north"), false);
+					} else if (inBounds(route.get(distance-1).getWall("west").getWall("south"))){
+						wallAdded = addPlayerWall(playersTurn, route.get(distance-1).getWall("west").getWall("south"), false);
+					}
+				}
+			}
+			if (wallAdded != "Wall Placed"){
+				choice = 0;
+			}
+		}
+		if (choice == 0){
+			route = getFastestPlayerRoute(playersTurn);
+			validMoves = getValidMoves();
+			for (int i = 0; i < route.size(); i++) {
+				Coordinate newPos = route.get(i);
+				for (int j = 0; j < validMoves.size(); j++) {
+					if (newPos.compare(validMoves.get(j))){
+						movePlayersPawn(getPlayersTurn(), newPos);
+					}
+				}
+			}
+		} 
 	}
 
 	/**
@@ -114,15 +189,15 @@ public class Quoridor {
 	 * @param player - the integer which refers to which Player is being affected
 	 * @param BoardLocation - the Coordinate location the Player's Pawn to be moved to on the 2-D BoardLocation array
 	 */
-	public boolean movePlayersPawn(Coordinate boardCoord){
+	public boolean movePlayersPawn(int player, Coordinate boardCoord){
 		//checks if players pawn had previous position to update board
-		if (models.getPlayers()[playersTurn].getPawnLocation() != null){
-			models.getBoard().setBoardLocation(models.getPlayers()[playersTurn].getPawnLocation(), BoardLocation.FREE_SQUARE);
+		if (models.getPlayers()[player].getPawnLocation() != null){
+			models.getBoard().setBoardLocation(models.getPlayers()[player].getPawnLocation(), BoardLocation.FREE_SQUARE);
 		}
 		//adds players pawn to new location
 		models.getBoard().setBoardLocation(boardCoord, BoardLocation.USED_SQUARE);
 		//moves player coordinates
-		models.getPlayers()[playersTurn].movePawn(boardCoord);
+		models.getPlayers()[player].movePawn(boardCoord);
 		return true;
 	}
 
@@ -140,7 +215,8 @@ public class Quoridor {
 		Deque<Coordinate> stack = new ArrayDeque<Coordinate>(); 
 		int sucesses = 0;
 		for (int i = 0; i < rules.MAX_PLAYERS; i++) {
-			stack = checkPlayerRoute(i, wallCoord,isHorizontal);
+			updateGridWithWall(wallCoord, isHorizontal);
+			stack = checkPlayerRoute(i);
 			if (stack.size() > 0){
 				sucesses++;
 			}
@@ -152,12 +228,11 @@ public class Quoridor {
 		}
 	}
 
-	public Deque<Coordinate> checkPlayerRoute(int player, Coordinate wallCoord, boolean isHorizontal){
+	public Deque<Coordinate> checkPlayerRoute(int player){
 		Deque<Coordinate> stack = new ArrayDeque<Coordinate>(); 
 		Coordinate pos = new Coordinate(0, 0);
 		boolean done = false;
 		boolean failed = false;
-		updateGrid(wallCoord, isHorizontal);
 		stack = new ArrayDeque<Coordinate>(); 
 		stack.push(getPlayers()[player].getPawnLocation());
 		done = false;
@@ -169,33 +244,164 @@ public class Quoridor {
 				failed = true;
 			}
 			if (failed == false){
-				grid[pos.getX()][pos.getY()] = 1;
+				if (getGridValue(pos) == 0){
+					grid[pos.getX()][pos.getY()] = 1;
+				} else {
+					grid[pos.getX()][pos.getY()] = 2;
+				}
 				if (checkFinish(player, pos) == true){
 					done = true;
 				} else {
-					if (validCoord(pos.getWall("north"))) {
-						stack.push(pos.getWall("north"));
+					String[] directionalStrings = getDirectionalStrings(player);
+					if (validCoord(pos.getWall(directionalStrings[3]))) {
+						stack.push(pos.getWall(directionalStrings[3]));
 					}
-					if (validCoord(pos.getWall("east"))) {
-						stack.push(pos.getWall("east"));
+					if (validCoord(pos.getWall(directionalStrings[2]))) {
+						stack.push(pos.getWall(directionalStrings[2]));
 					}
-					if (validCoord(pos.getWall("south"))) {
-						stack.push(pos.getWall("south"));
+					if (validCoord(pos.getWall(directionalStrings[1]))) {
+						stack.push(pos.getWall(directionalStrings[1]));
 					}
-					if (validCoord(pos.getWall("west"))) {
-						stack.push(pos.getWall("west"));
+					if (validCoord(pos.getWall(directionalStrings[0]))) {
+						stack.push(pos.getWall(directionalStrings[0]));
 					}
 				}
 			}
 		}
-		System.out.println(gridToString());
 		return stack;
+	}
+
+	public ArrayList<Coordinate> getFastestPlayerRoute(int player){
+		ArrayList<ArrayList<Coordinate>> allRoutes = new ArrayList<ArrayList<Coordinate>>();
+		for (int i = 0; i < 24; i++) {
+			updateGrid();
+			ArrayList<Coordinate> testRoute = new ArrayList<Coordinate>();
+			Deque<Coordinate> stack = new ArrayDeque<Coordinate>(); 
+			Coordinate pos = new Coordinate(0, 0);
+			boolean done = false;
+			boolean failed = false;
+			stack = new ArrayDeque<Coordinate>(); 
+			stack.push(getPlayers()[player].getPawnLocation());
+			done = false;
+			failed = false;
+			while (done == false && failed == false){
+				if (stack.size() > 0){
+					pos = stack.pop();
+					if (getGridValue(pos) == 0){
+						testRoute.add(pos);
+					}
+				} else if (stack.size() == 0) {
+					failed = true;
+				}
+				if (failed == false){
+					if (getGridValue(pos) == 0){
+						grid[pos.getX()][pos.getY()] = 1;
+					} else {
+						grid[pos.getX()][pos.getY()] = 2;
+					}
+					if (checkFinish(player, pos) == true){
+						done = true;
+					} else {
+						String[] directionalStrings = getDirectionalStrings(i);
+						if (validCoord(pos.getWall(directionalStrings[3]))) {
+							stack.push(pos.getWall(directionalStrings[3]));
+						}
+						if (validCoord(pos.getWall(directionalStrings[2]))) {
+							stack.push(pos.getWall(directionalStrings[2]));
+						}
+						if (validCoord(pos.getWall(directionalStrings[1]))) {
+							stack.push(pos.getWall(directionalStrings[1]));
+						}
+						if (validCoord(pos.getWall(directionalStrings[0]))) {
+							stack.push(pos.getWall(directionalStrings[0]));
+						}
+					}
+				}
+			}
+			allRoutes.add(updateRoute(testRoute));
+		}
+		
+		ArrayList<Coordinate> fastestRoute = allRoutes.get(0);
+		for (int i = 0; i < allRoutes.size(); i++) {
+			if (allRoutes.get(i).size() < fastestRoute.size() &&
+				checkRoutePossible(allRoutes.get(i))){
+				fastestRoute = allRoutes.get(i);
+			}
+		}
+		return fastestRoute;
+	}
+
+	public ArrayList<Coordinate> updateRoute(ArrayList<Coordinate> route){
+		updateGrid();
+		ArrayList<Coordinate> newRoute = new ArrayList<Coordinate>();
+		for (int x = 0; x < route.size(); x++) {
+			newRoute.add(route.get(x));
+			for (int y = route.size()-1; y > x+1 ; y--) {
+				if ((route.get(x).compare(route.get(y).getSquare("north")) && 
+					getGridValue(route.get(y).getWall("north")) == 3) ||
+					(route.get(x).compare(route.get(y).getSquare("east")) && 
+					getGridValue(route.get(y).getWall("east")) == 3) ||
+					(route.get(x).compare(route.get(y).getSquare("south")) && 
+					getGridValue(route.get(y).getWall("south")) == 3) ||
+					(route.get(x).compare(route.get(y).getSquare("west")) && 
+					getGridValue(route.get(y).getWall("west")) == 3)){
+					newRoute.add(route.get(y));
+					x = y;
+				}
+			}
+		}
+		return newRoute;
+	}
+	
+	public boolean checkRoutePossible(ArrayList<Coordinate> route){
+		for (int i = 0; i < route.size()-1; i++) {
+			if (!route.get(i).getSquare("north").compare(route.get(i+1)) &&
+				!route.get(i).getSquare("east").compare(route.get(i+1)) &&
+				!route.get(i).getSquare("south").compare(route.get(i+1)) &&
+				!route.get(i).getSquare("west").compare(route.get(i+1))){
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public String[] getDirectionalStrings(int player){
+		switch (player){
+		case 0: return new String[]{"north","west","east","south"};
+		case 1: return new String[]{"north","west","south","east"};
+		case 2: return new String[]{"north","east","south","west"};
+		case 3: return new String[]{"north","east","west","south"};
+		case 4: return new String[]{"north","south","east","west"};
+		case 5: return new String[]{"north","south","west","east"};
+		
+		case 6: return new String[]{"east","west","north","south"};
+		case 7: return new String[]{"east","west","south","north"};
+		case 8: return new String[]{"east","north","south","west"};
+		case 9: return new String[]{"east","north","west","south"};
+		case 10: return new String[]{"east","south","north","west"};
+		case 11: return new String[]{"east","south","west","north"};
+		
+		case 12: return new String[]{"south","west","north","east"};
+		case 13: return new String[]{"south","west","east","north"};
+		case 14: return new String[]{"south","north","east","west"};
+		case 15: return new String[]{"south","north","west","east"};
+		case 16: return new String[]{"south","east","north","west"};
+		case 17: return new String[]{"south","east","west","north"};
+		
+		case 18: return new String[]{"west","east","north","south"};
+		case 19: return new String[]{"west","east","south","north"};
+		case 20: return new String[]{"west","north","south","east"};
+		case 21: return new String[]{"west","north","east","south"};
+		case 22: return new String[]{"west","south","north","east"};
+		case 23: return new String[]{"west","south","east","north"};
+		default: return null;
+		}
 	}
 
 	public boolean validCoord(Coordinate coord){
 		if (inBounds(coord) == true){
-			if (grid[coord.getX()][coord.getY()] != 1 &&
-				grid[coord.getX()][coord.getY()] != 2){
+			if (getGridValue(coord) == 0 ||
+				getGridValue(coord) == 3){
 				return true;
 			} else {
 				return false;
@@ -204,28 +410,50 @@ public class Quoridor {
 			return false;
 		}
 	}
+	
+	public int getGridValue(Coordinate coord){
+		return grid[coord.getX()][coord.getY()];
+	}
 
-	public void updateGrid(Coordinate wallCoord, boolean isHorizontal){
+	public void updateGrid(){
 		for (int x = 0; x < 17; x++) {
 			for (int y = 0; y < 17; y++) {
 				BoardLocation boardLoc = getBoard().getBoardLocation(new Coordinate(x,y));
-				if (boardLoc == BoardLocation.USED_GAP ||
-					boardLoc == BoardLocation.FREE_WALLGAP ||
-					boardLoc == BoardLocation.USED_WALLGAP ||
+				if (boardLoc == BoardLocation.FREE_WALLGAP ||
+					boardLoc == BoardLocation.USED_WALLGAP || 
 					boardLoc == BoardLocation.USED_GAP){
-					grid[x][y] = 2;
+					grid[x][y] = 4;
+				} else if (boardLoc == BoardLocation.FREE_GAP){
+					grid[x][y] = 3;
 				} else {
 					grid[x][y] = 0;
 				}
 			}
 		}
-		grid[wallCoord.getX()][wallCoord.getY()] = 2;
+	}
+
+	public void updateGridWithWall(Coordinate wallCoord, boolean isHorizontal){
+		for (int x = 0; x < 17; x++) {
+			for (int y = 0; y < 17; y++) {
+				BoardLocation boardLoc = getBoard().getBoardLocation(new Coordinate(x,y));
+				if (boardLoc == BoardLocation.FREE_WALLGAP ||
+					boardLoc == BoardLocation.USED_WALLGAP || 
+					boardLoc == BoardLocation.USED_GAP){
+					grid[x][y] = 4;
+				} else if (boardLoc == BoardLocation.FREE_GAP){
+					grid[x][y] = 3;
+				} else {
+					grid[x][y] = 0;
+				}
+			}
+		}
+		grid[wallCoord.getX()][wallCoord.getY()] = 4;
 		if (isHorizontal == true){
-			grid[wallCoord.getWall("east").getX()][wallCoord.getY()] = 2;
-			grid[wallCoord.getWall("west").getX()][wallCoord.getY()] = 2;
+			grid[wallCoord.getWall("east").getX()][wallCoord.getY()] = 4;
+			grid[wallCoord.getWall("west").getX()][wallCoord.getY()] = 4;
 		} else {
-			grid[wallCoord.getX()][wallCoord.getWall("north").getY()] = 2;
-			grid[wallCoord.getX()][wallCoord.getWall("south").getY()] = 2;
+			grid[wallCoord.getX()][wallCoord.getWall("north").getY()] = 4;
+			grid[wallCoord.getX()][wallCoord.getWall("south").getY()] = 4;
 		}
 	}
 
@@ -234,7 +462,7 @@ public class Quoridor {
 		for (int x = 0; x < 17; x++) {
 			sb.append("[");
 			for (int y = 0; y < 17; y++) {
-				sb.append(grid[x][y].toString()+" ");
+				sb.append(grid[y][x].toString()+" ");
 				if (y == 16){
 					sb.append("] \n");
 				}
