@@ -23,6 +23,7 @@ public class NewGameView implements ViewPanel {
 	private JPanel newGamePanel;
 	private final JComboBox gameMode;
 	private final JComboBox gameRules;
+	private final JComboBox wallRules;
 	private Language currentLanguage;
 	private ResourceBundle messages;
 	//Options for the JComboBoxes
@@ -30,6 +31,7 @@ public class NewGameView implements ViewPanel {
 	private String[] gameRulesStrings;
 	private String[] playerTypeStrings;
 	private String[] playerColourStrings;
+	private String[] gameWallsStrings;
 	
 	private JLabel[] playerLabels; 
 	private JComboBox[] playerTypes;
@@ -50,6 +52,7 @@ public class NewGameView implements ViewPanel {
 		
 		//Options for the JComboBoxes
 		gamePlayersStrings = new String[]{messages.getString("2_player_game"), messages.getString("4_player_game")};
+		gameWallsStrings = new String[]{messages.getString("walls_5"), messages.getString("walls_10"), messages.getString("walls_15"), messages.getString("walls_20")};
 		gameRulesStrings = new String[]{messages.getString("normal_rules"), messages.getString("challenge_rules")};
 		playerTypeStrings = new String[]{messages.getString("bot_player"), messages.getString("human_player")};
 		playerColourStrings = new String[]{messages.getString("colour_red"), messages.getString("colour_blue"), messages.getString("colour_green"), messages.getString("colour_yellow")};
@@ -57,8 +60,10 @@ public class NewGameView implements ViewPanel {
 		// Create the components
 		gameMode = new JComboBox(gamePlayersStrings);
 		gameRules = new JComboBox(gameRulesStrings);
+		wallRules = new JComboBox(gameWallsStrings);
 		JLabel gameModeLabel = new JLabel(messages.getString("game_mode"));
 		JLabel gameRulesLabel = new JLabel(messages.getString("game_rules"));
+		JLabel wallRulesLabel = new JLabel(messages.getString("players_walls"));
 		
 		JButton startGameButton = new JButton();
 		JButton backButton = new JButton();
@@ -71,6 +76,7 @@ public class NewGameView implements ViewPanel {
 		// Set the properties of the components	
 		gameMode.setSelectedIndex(0);
 		gameRules.setSelectedIndex(0);
+		wallRules.setSelectedIndex(0);
 	
 		header.setLocation(200, 0);
 		header.setSize(400, 200);
@@ -104,6 +110,8 @@ public class NewGameView implements ViewPanel {
 		newGamePanel.add(gameMode);
 		newGamePanel.add(gameRulesLabel);
 		newGamePanel.add(gameRules);
+		newGamePanel.add(wallRulesLabel);
+		newGamePanel.add(wallRules);
 		panel.add(header);
 		panel.add(newGamePanel);
 		panel.add(playerDetailsPanel);
@@ -187,7 +195,7 @@ public class NewGameView implements ViewPanel {
 			break;
 		case "4":
 			playerDetailsPanel.setLayout(new GridLayout(5, 4, 20, 10));
-			playerDetailsPanel.setSize(400, 200);
+			playerDetailsPanel.setSize(400, 170);
 			for (int i = 0; i < 4; i++) {
 				playerDetailsPanel.add(playerLabels[i]);
 				playerTypes[i].addItemListener (new ItemListener () {
@@ -272,7 +280,6 @@ public class NewGameView implements ViewPanel {
 		switch(gameMode.getSelectedItem().toString().substring(0, 1)){
 		case "2":
 			playerCount = 2;
-			wallCount = 10;
 			colours = new String[]{playerColours[0].getSelectedItem().toString(), playerColours[1].getSelectedItem().toString()};
 			names = new String[]{playerNames[0].getText(), playerNames[1].getText()};
 			for (int i = 0; i < 2; i++) {
@@ -283,7 +290,6 @@ public class NewGameView implements ViewPanel {
 			break;
 		case "4":
 			playerCount = 4;
-			wallCount = 5;
 			colours = new String[]{playerColours[0].getSelectedItem().toString(), playerColours[1].getSelectedItem().toString(), playerColours[2].getSelectedItem().toString(), playerColours[3].getSelectedItem().toString()};
 			names = new String[]{playerNames[0].getText(), playerNames[1].getText(), playerNames[2].getText(), playerNames[3].getText()};
 			for (int i = 0; i < 4; i++) {
@@ -292,6 +298,12 @@ public class NewGameView implements ViewPanel {
 				}
 			}
 			break;
+		}
+		switch(wallRules.getSelectedItem().toString().substring(0, 2)){
+		case "5 ": wallCount = 5;break;
+		case "10": wallCount = 10;break;
+		case "15": wallCount = 15;break;
+		case "20": wallCount = 20;break;
 		}
 		theRules = new Rules(wallCount, playerCount, colours, names, botIDs, gameRules.getSelectedItem().toString());
 		return theRules;

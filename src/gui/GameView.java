@@ -518,7 +518,7 @@ public class GameView implements ViewPanel {
 	}
 
 	public void undoPlayersMove() {
-		if(turnTaken.length() == 0){
+		if(turnTaken.length() != 0){
 			Coordinate coord;
 			switch (turnTaken.substring(0, 4)) {
 			case "Pawn":

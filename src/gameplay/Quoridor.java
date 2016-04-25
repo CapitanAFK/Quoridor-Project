@@ -143,14 +143,14 @@ public class Quoridor {
 					} else if (inBounds(route.get(distance-1).getWall("north").getWall("west"))){
 						wallAdded = addPlayerWall(playersTurn, route.get(distance-1).getWall("north").getWall("west"), true);
 					}
-					
+
 				} else if (route.get(distance-1).getSquare("south").compare(newPos)){
 					if (inBounds(route.get(distance-1).getWall("south").getWall("east"))){
 						wallAdded = addPlayerWall(playersTurn, route.get(distance-1).getWall("south").getWall("east"), true);
 					} else if (inBounds(route.get(distance-1).getWall("south").getWall("west"))){
 						wallAdded = addPlayerWall(playersTurn, route.get(distance-1).getWall("south").getWall("west"), true);
 					}
-					
+
 				} else if (route.get(distance-1).getSquare("east").compare(newPos)){
 					if (inBounds(route.get(distance-1).getWall("east").getWall("north"))){
 						wallAdded = addPlayerWall(playersTurn, route.get(distance-1).getWall("east").getWall("north"), false);
@@ -289,6 +289,16 @@ public class Quoridor {
 					pos = stack.pop();
 					if (getGridValue(pos) == 0){
 						testRoute.add(pos);
+						if (!checkRoutePossible(testRoute)){
+							RouteUpdater:
+							for (int x = testRoute.size()-2; x > 0; x--) {
+								if (!checkIsValidNeighbour(testRoute.get(testRoute.size()-1),testRoute.get(x))){
+									testRoute.remove(x);
+								} else {
+									break RouteUpdater;
+								}
+							}
+						}
 					}
 				} else if (stack.size() == 0) {
 					failed = true;
@@ -318,87 +328,59 @@ public class Quoridor {
 					}
 				}
 			}
-			allRoutes.add(updateRoute(testRoute));
+			testRoute = shortenRoute(testRoute);
+			allRoutes.add(testRoute);
 		}
-		
+
 		ArrayList<Coordinate> fastestRoute = allRoutes.get(0);
 		for (int i = 0; i < allRoutes.size(); i++) {
-			System.out.println(allRoutes.get(i).size()+": "+checkRoutePossible(allRoutes.get(i)));
 			if (allRoutes.get(i).size() < fastestRoute.size()){
 				fastestRoute = allRoutes.get(i);
 			}
 		}
 		return fastestRoute;
 	}
-
-//	public ArrayList<Coordinate> updateRoute(ArrayList<Coordinate> route){
-//		updateGrid();
-//		ArrayList<Coordinate> newRoute = new ArrayList<Coordinate>();
-//		for (int x = 0; x < route.size(); x++) {
-//			newRoute.add(route.get(x));
-//			for (int y = route.size()-1; y > x+1 ; y--) {
-//				if ((route.get(x).compare(route.get(y).getSquare("north")) && 
-//					getGridValue(route.get(y).getWall("north")) == 3) ||
-//					(route.get(x).compare(route.get(y).getSquare("east")) && 
-//					getGridValue(route.get(y).getWall("east")) == 3) ||
-//					(route.get(x).compare(route.get(y).getSquare("south")) && 
-//					getGridValue(route.get(y).getWall("south")) == 3) ||
-//					(route.get(x).compare(route.get(y).getSquare("west")) && 
-//					getGridValue(route.get(y).getWall("west")) == 3)){
-//					newRoute.add(route.get(y));
-//					x = y;
-//				}
-//			}
-//		}
-//		return newRoute;
-//	}
 	
-	public ArrayList<Coordinate> updateRoute(ArrayList<Coordinate> route){
+	public boolean checkIsValidNeighbour(Coordinate coord1, Coordinate coord2){
+		if (coord1.compare(coord2.getSquare("north")) ||
+			coord1.compare(coord2.getSquare("east"))  ||
+			coord1.compare(coord2.getSquare("south")) ||
+			coord1.compare(coord2.getSquare("west"))){
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public ArrayList<Coordinate> shortenRoute(ArrayList<Coordinate> route){
 		updateGrid();
 		ArrayList<Coordinate> newRoute = new ArrayList<Coordinate>();
 		for (int x = 0; x < route.size(); x++) {
 			newRoute.add(route.get(x));
-			if (!checkRoutePossible(newRoute)){
-				SearchLoop:
-				for (int y = 0; y < x; y++) {
+			SearchLoop:
+				for (int y = x+2; y < route.size(); y++) {
 					if ((route.get(y).compare(route.get(x).getSquare("north")) && 
 							getGridValue(route.get(x).getWall("north")) == 3) ||
 							(route.get(y).compare(route.get(x).getSquare("east")) && 
-							getGridValue(route.get(x).getWall("east")) == 3) ||
-							(route.get(y).compare(route.get(x).getSquare("south")) && 
-							getGridValue(route.get(x).getWall("south")) == 3) ||
-							(route.get(y).compare(route.get(x).getSquare("west")) && 
-							getGridValue(route.get(x).getWall("west")) == 3)){
-						for (int i = y+1; i < x; i++) {
-							newRoute.remove(route.get(i));
-						}
+									getGridValue(route.get(x).getWall("east")) == 3) ||
+									(route.get(y).compare(route.get(x).getSquare("south")) && 
+											getGridValue(route.get(x).getWall("south")) == 3) ||
+											(route.get(y).compare(route.get(x).getSquare("west")) && 
+													getGridValue(route.get(x).getWall("west")) == 3)){
+						x = y-1;
 						break SearchLoop;
 					}
 				}
-			}
-		}
-		if (!checkRoutePossible(newRoute)){
-			int jk = 0;
-			for (Coordinate coordinate : route) {
-				System.out.println("Original coord "+jk+": "+coordinate.toString());
-				jk++;
-			}
-			jk=0;
-			for (Coordinate coordinate : newRoute) {
-				System.out.println("Fail coord "+jk+": "+coordinate.toString());
-				jk++;
-			}
-		}
-
+		}		
 		return newRoute;
 	}
-	
+
 	public boolean checkRoutePossible(ArrayList<Coordinate> route){
 		for (int i = 0; i < route.size()-1; i++) {
 			if (!route.get(i).getSquare("north").compare(route.get(i+1)) &&
-				!route.get(i).getSquare("east").compare(route.get(i+1)) &&
-				!route.get(i).getSquare("south").compare(route.get(i+1)) &&
-				!route.get(i).getSquare("west").compare(route.get(i+1))){
+					!route.get(i).getSquare("east").compare(route.get(i+1)) &&
+					!route.get(i).getSquare("south").compare(route.get(i+1)) &&
+					!route.get(i).getSquare("west").compare(route.get(i+1))){
 				return false;
 			}
 		}
@@ -413,21 +395,21 @@ public class Quoridor {
 		case 3: return new String[]{"north","east","west","south"};
 		case 4: return new String[]{"north","south","east","west"};
 		case 5: return new String[]{"north","south","west","east"};
-		
+
 		case 6: return new String[]{"east","west","north","south"};
 		case 7: return new String[]{"east","west","south","north"};
 		case 8: return new String[]{"east","north","south","west"};
 		case 9: return new String[]{"east","north","west","south"};
 		case 10: return new String[]{"east","south","north","west"};
 		case 11: return new String[]{"east","south","west","north"};
-		
+
 		case 12: return new String[]{"south","west","north","east"};
 		case 13: return new String[]{"south","west","east","north"};
 		case 14: return new String[]{"south","north","east","west"};
 		case 15: return new String[]{"south","north","west","east"};
 		case 16: return new String[]{"south","east","north","west"};
 		case 17: return new String[]{"south","east","west","north"};
-		
+
 		case 18: return new String[]{"west","east","north","south"};
 		case 19: return new String[]{"west","east","south","north"};
 		case 20: return new String[]{"west","north","south","east"};
@@ -441,7 +423,7 @@ public class Quoridor {
 	public boolean validCoord(Coordinate coord){
 		if (inBounds(coord) == true){
 			if (getGridValue(coord) == 0 ||
-				getGridValue(coord) == 3){
+					getGridValue(coord) == 3){
 				return true;
 			} else {
 				return false;
@@ -450,7 +432,7 @@ public class Quoridor {
 			return false;
 		}
 	}
-	
+
 	public int getGridValue(Coordinate coord){
 		return grid[coord.getX()][coord.getY()];
 	}
@@ -460,8 +442,8 @@ public class Quoridor {
 			for (int y = 0; y < 17; y++) {
 				BoardLocation boardLoc = getBoard().getBoardLocation(new Coordinate(x,y));
 				if (boardLoc == BoardLocation.FREE_WALLGAP ||
-					boardLoc == BoardLocation.USED_WALLGAP || 
-					boardLoc == BoardLocation.USED_GAP){
+						boardLoc == BoardLocation.USED_WALLGAP || 
+						boardLoc == BoardLocation.USED_GAP){
 					grid[x][y] = 4;
 				} else if (boardLoc == BoardLocation.FREE_GAP){
 					grid[x][y] = 3;
@@ -477,8 +459,8 @@ public class Quoridor {
 			for (int y = 0; y < 17; y++) {
 				BoardLocation boardLoc = getBoard().getBoardLocation(new Coordinate(x,y));
 				if (boardLoc == BoardLocation.FREE_WALLGAP ||
-					boardLoc == BoardLocation.USED_WALLGAP || 
-					boardLoc == BoardLocation.USED_GAP){
+						boardLoc == BoardLocation.USED_WALLGAP || 
+						boardLoc == BoardLocation.USED_GAP){
 					grid[x][y] = 4;
 				} else if (boardLoc == BoardLocation.FREE_GAP){
 					grid[x][y] = 3;
