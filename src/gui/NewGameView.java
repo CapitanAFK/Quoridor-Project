@@ -166,9 +166,9 @@ public class NewGameView implements ViewPanel {
 		}
 		
 		playerDetailsPanel.add(new JLabel(""));
-		playerDetailsPanel.add(new JLabel("Type"));
-		playerDetailsPanel.add(new JLabel("Colour"));
-		playerDetailsPanel.add(new JLabel("Name"));
+		playerDetailsPanel.add(new JLabel(messages.getString("player")));
+		playerDetailsPanel.add(new JLabel(messages.getString("colour")));
+		playerDetailsPanel.add(new JLabel(messages.getString("name")));
 		
 		switch(gameMode.getSelectedItem().toString().substring(0, 1)){
 		case "2":
