@@ -323,33 +323,73 @@ public class Quoridor {
 		
 		ArrayList<Coordinate> fastestRoute = allRoutes.get(0);
 		for (int i = 0; i < allRoutes.size(); i++) {
-			if (allRoutes.get(i).size() < fastestRoute.size() &&
-				checkRoutePossible(allRoutes.get(i))){
+			System.out.println(allRoutes.get(i).size()+": "+checkRoutePossible(allRoutes.get(i)));
+			if (allRoutes.get(i).size() < fastestRoute.size()){
 				fastestRoute = allRoutes.get(i);
 			}
 		}
 		return fastestRoute;
 	}
 
+//	public ArrayList<Coordinate> updateRoute(ArrayList<Coordinate> route){
+//		updateGrid();
+//		ArrayList<Coordinate> newRoute = new ArrayList<Coordinate>();
+//		for (int x = 0; x < route.size(); x++) {
+//			newRoute.add(route.get(x));
+//			for (int y = route.size()-1; y > x+1 ; y--) {
+//				if ((route.get(x).compare(route.get(y).getSquare("north")) && 
+//					getGridValue(route.get(y).getWall("north")) == 3) ||
+//					(route.get(x).compare(route.get(y).getSquare("east")) && 
+//					getGridValue(route.get(y).getWall("east")) == 3) ||
+//					(route.get(x).compare(route.get(y).getSquare("south")) && 
+//					getGridValue(route.get(y).getWall("south")) == 3) ||
+//					(route.get(x).compare(route.get(y).getSquare("west")) && 
+//					getGridValue(route.get(y).getWall("west")) == 3)){
+//					newRoute.add(route.get(y));
+//					x = y;
+//				}
+//			}
+//		}
+//		return newRoute;
+//	}
+	
 	public ArrayList<Coordinate> updateRoute(ArrayList<Coordinate> route){
 		updateGrid();
 		ArrayList<Coordinate> newRoute = new ArrayList<Coordinate>();
 		for (int x = 0; x < route.size(); x++) {
 			newRoute.add(route.get(x));
-			for (int y = route.size()-1; y > x+1 ; y--) {
-				if ((route.get(x).compare(route.get(y).getSquare("north")) && 
-					getGridValue(route.get(y).getWall("north")) == 3) ||
-					(route.get(x).compare(route.get(y).getSquare("east")) && 
-					getGridValue(route.get(y).getWall("east")) == 3) ||
-					(route.get(x).compare(route.get(y).getSquare("south")) && 
-					getGridValue(route.get(y).getWall("south")) == 3) ||
-					(route.get(x).compare(route.get(y).getSquare("west")) && 
-					getGridValue(route.get(y).getWall("west")) == 3)){
-					newRoute.add(route.get(y));
-					x = y;
+			if (!checkRoutePossible(newRoute)){
+				SearchLoop:
+				for (int y = 0; y < x; y++) {
+					if ((route.get(y).compare(route.get(x).getSquare("north")) && 
+							getGridValue(route.get(x).getWall("north")) == 3) ||
+							(route.get(y).compare(route.get(x).getSquare("east")) && 
+							getGridValue(route.get(x).getWall("east")) == 3) ||
+							(route.get(y).compare(route.get(x).getSquare("south")) && 
+							getGridValue(route.get(x).getWall("south")) == 3) ||
+							(route.get(y).compare(route.get(x).getSquare("west")) && 
+							getGridValue(route.get(x).getWall("west")) == 3)){
+						for (int i = y+1; i < x; i++) {
+							newRoute.remove(route.get(i));
+						}
+						break SearchLoop;
+					}
 				}
 			}
 		}
+		if (!checkRoutePossible(newRoute)){
+			int jk = 0;
+			for (Coordinate coordinate : route) {
+				System.out.println("Original coord "+jk+": "+coordinate.toString());
+				jk++;
+			}
+			jk=0;
+			for (Coordinate coordinate : newRoute) {
+				System.out.println("Fail coord "+jk+": "+coordinate.toString());
+				jk++;
+			}
+		}
+
 		return newRoute;
 	}
 	

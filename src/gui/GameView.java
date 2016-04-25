@@ -3,6 +3,7 @@ package gui;
 import gameplay.Controls;
 import gameplay.Quoridor;
 import gameplay.Rules;
+import gameplay.Statistics;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -75,10 +76,13 @@ public class GameView implements ViewPanel {
 	// Set the current language
 	private Language currentLanguage = new Language();
 	private ResourceBundle messages = currentLanguage.getMessages();
+	
+	private Statistics stats;
 
 	public GameView(Rules rules) {
 		// Initialise Game
 		controls = new Controls();
+		stats = new Statistics(rules.MAX_PLAYERS);
 		quoridor = new Quoridor(rules);
 		quoridor.beginGame();
 		turnTaken = null;
@@ -514,34 +518,37 @@ public class GameView implements ViewPanel {
 	}
 
 	public void undoPlayersMove() {
-		Coordinate coord;
-		switch (turnTaken.substring(0, 4)) {
-		case "Pawn":
-			coord = getCoordFromString();
-			quoridor.movePlayersPawn(quoridor.getPlayersTurn(),coord);
-			currentState = GameState.MovingPlayer;
-			break;
-		case "Vall":
-			coord = getCoordFromString();
-			quoridor.removePlayerWall(coord, true);
-			currentState = GameState.PlacingVWall;
-			break;
-		case "Hall":
-			coord = getCoordFromString();
-			quoridor.removePlayerWall(coord, true);
-			currentState = GameState.PlacingHWall;
-			break;
-		case "Rall":
-			coord = getCoordFromString();
-			int player = getPlayerFromString();
-			boolean isHorizontal = getIsHorizontalFromString();
-			quoridor.addPlayerWall(player, coord, isHorizontal);
-			currentState = GameState.RemovingWall;
-			break;
+		if(turnTaken.length() == 0){
+			Coordinate coord;
+			switch (turnTaken.substring(0, 4)) {
+			case "Pawn":
+				coord = getCoordFromString();
+				quoridor.movePlayersPawn(quoridor.getPlayersTurn(),coord);
+				currentState = GameState.MovingPlayer;
+				break;
+			case "Vall":
+				coord = getCoordFromString();
+				quoridor.removePlayerWall(coord, true);
+				currentState = GameState.PlacingVWall;
+				break;
+			case "Hall":
+				coord = getCoordFromString();
+				quoridor.removePlayerWall(coord, true);
+				currentState = GameState.PlacingHWall;
+				break;
+			case "Rall":
+				coord = getCoordFromString();
+				int player = getPlayerFromString();
+				boolean isHorizontal = getIsHorizontalFromString();
+				quoridor.addPlayerWall(player, coord, isHorizontal);
+				currentState = GameState.RemovingWall;
+				break;
+			}
+			stats.incrementUndosTaken(quoridor.getPlayersTurn());
+			turnTaken = null;
+			activateState();
+			updateButtons();
 		}
-		turnTaken = null;
-		activateState();
-		updateButtons();
 	}
 
 	public void hWallSelected() {
@@ -691,6 +698,7 @@ public class GameView implements ViewPanel {
 				turnTaken = "Hall " + boardCoord.toString();
 				activateState();
 				updateButtons();
+				stats.incrementWallsPlaced(quoridor.getPlayersTurn());
 			}
 			break;
 		case "PlacingVWall":
@@ -699,6 +707,7 @@ public class GameView implements ViewPanel {
 				turnTaken = "Vall " + boardCoord.toString();
 				activateState();
 				updateButtons();
+				stats.incrementWallsPlaced(quoridor.getPlayersTurn());
 			}
 			break;
 		case "RemovingWall":
@@ -708,6 +717,7 @@ public class GameView implements ViewPanel {
 				turnTaken = "Rall " + boardCoord.toString()+outcome;
 				activateState();
 				updateButtons();
+				stats.incrementWallsRemoved(quoridor.getPlayersTurn());
 			}
 			break;
 		}
@@ -786,6 +796,7 @@ public class GameView implements ViewPanel {
 						return true;
 					}
 				}
+				stats.incrementStepsTaken((quoridor.getPlayersTurn()));
 			}
 			break;
 		}
