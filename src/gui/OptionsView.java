@@ -29,7 +29,7 @@ public class OptionsView implements ViewPanel {
 		final int blankSpace = 200;  // Blank border at the edges of the panel
 		
 		//Options for the JComboBoxes
-		String[] languages = {"English", "Polski", "Zulu", "Afrikaans", "Xhosa"};
+		String[] languages = {"English", "Polish", "Zulu", "Afrikaans", "Xhosa"};
 		
 		// Create the components
 		ImageIcon headerImage = new ImageIcon(messages.getString("options_title"));
@@ -104,7 +104,7 @@ public class OptionsView implements ViewPanel {
 					writer = new PrintWriter("textFiles/currentLanguage.txt");
 					if(language.getSelectedItem() == "English"){
 						writer.print("en");
-					} else if(language.getSelectedItem() == "Polski"){
+					} else if(language.getSelectedItem() == "Polish"){
 						writer.print("pl");
 					} else if(language.getSelectedItem() == "Zulu"){
 						writer.print("zu");
@@ -135,7 +135,7 @@ public class OptionsView implements ViewPanel {
 		if(tmpLng.equals("en")){
 			language.setSelectedItem("English");
 		} else if(tmpLng.equals("pl")) {
-			language.setSelectedItem("Polski");
+			language.setSelectedItem("Polish");
 		} else if(tmpLng.equals("zu")) {
 			language.setSelectedItem("Zulu");
 		} else if(tmpLng.equals("af")) {
