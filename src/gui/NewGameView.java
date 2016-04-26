@@ -32,31 +32,31 @@ public class NewGameView implements ViewPanel {
 	private String[] playerTypeStrings;
 	private String[] playerColourStrings;
 	private String[] gameWallsStrings;
-	
+
 	private JLabel[] playerLabels; 
 	private JComboBox[] playerTypes;
 	private JComboBox[] playerColours;
 	private JTextField[] playerNames;
-	
+
 	private int playerColourChange;
 	private int playerNumberChange;
 	private int active = 0;
-	
-	
+
+
 	public NewGameView() {	
 		// Set the current language
 		currentLanguage = new Language();
 		messages = currentLanguage.getMessages();
-		
+
 		final int blankSpace = 100;  // Blank border at the edges of the panel
-		
+
 		//Options for the JComboBoxes
 		gamePlayersStrings = new String[]{messages.getString("2_player_game"), messages.getString("4_player_game")};
 		gameWallsStrings = new String[]{messages.getString("walls_5"), messages.getString("walls_10"), messages.getString("walls_15"), messages.getString("walls_20")};
 		gameRulesStrings = new String[]{messages.getString("normal_rules"), messages.getString("challenge_rules")};
-		playerTypeStrings = new String[]{messages.getString("bot_player"), messages.getString("human_player")};
+		playerTypeStrings = new String[]{messages.getString("computer_player"), messages.getString("human_player")};
 		playerColourStrings = new String[]{messages.getString("colour_red"), messages.getString("colour_blue"), messages.getString("colour_green"), messages.getString("colour_yellow")};
-		
+
 		// Create the components
 		gameMode = new JComboBox(gamePlayersStrings);
 		gameRules = new JComboBox(gameRulesStrings);
@@ -64,47 +64,47 @@ public class NewGameView implements ViewPanel {
 		JLabel gameModeLabel = new JLabel(messages.getString("game_mode"));
 		JLabel gameRulesLabel = new JLabel(messages.getString("game_rules"));
 		JLabel wallRulesLabel = new JLabel(messages.getString("players_walls"));
-		
+
 		JButton startGameButton = new JButton();
 		JButton backButton = new JButton();
-		
+
 		ImageIcon headerImage = new ImageIcon(messages.getString("new_game_title"));
 		JLabel header = new JLabel(headerImage);
-		
+
 		JLabel blankLabel = new JLabel(" ");
-		
+
 		// Set the properties of the components	
 		gameMode.setSelectedIndex(0);
 		gameRules.setSelectedIndex(0);
 		wallRules.setSelectedIndex(0);
-	
+
 		header.setLocation(200, 0);
 		header.setSize(400, 200);
-		
+
 		startGameButton.setText(messages.getString("start"));
 		startGameButton.setSize(100, 50);
 		startGameButton.setLocation(450, 460);
-		
+
 		backButton.setText(messages.getString("back"));
 		backButton.setSize(100, 50);
 		backButton.setLocation(250, 460);
-		
+
 		// Create containers to hold the components
 		playerDetailsPanel = new JPanel();
 		newGamePanel = new JPanel();
 		panel = new JPanel();
-		
+
 		//Specify LayoutManagers
 		panel.setLayout(null);
 		newGamePanel.setLayout(new GridLayout(0, 2, 0, 10));
 		updatePlayerInputs();
-		
+
 		newGamePanel.setSize(300, 100);
 		newGamePanel.setLocation(250, 120);
-		
+
 		playerDetailsPanel.setSize(400, 100);
 		playerDetailsPanel.setLocation(200, 240);		
-		
+
 		// Add components to containers
 		newGamePanel.add(gameModeLabel);
 		newGamePanel.add(gameMode);
@@ -117,7 +117,7 @@ public class NewGameView implements ViewPanel {
 		panel.add(playerDetailsPanel);
 		panel.add(startGameButton);
 		panel.add(backButton);
-		
+
 		// Events
 		startGameButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -130,7 +130,7 @@ public class NewGameView implements ViewPanel {
 				gv.getJPanel().requestFocusInWindow();
 			}
 		});
-		
+
 		backButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				panel.setVisible(false);
@@ -140,12 +140,12 @@ public class NewGameView implements ViewPanel {
 			}
 		});
 		gameMode.addActionListener (new ActionListener () {
-		    public void actionPerformed(ActionEvent e) {
-		    	updatePlayerInputs();
-		    }
+			public void actionPerformed(ActionEvent e) {
+				updatePlayerInputs();
+			}
 		});
 	}
-	
+
 	public void updatePlayerInputs(){
 		playerDetailsPanel.removeAll();
 		playerDetailsPanel.revalidate();
@@ -157,21 +157,22 @@ public class NewGameView implements ViewPanel {
 		playerColours[2].setSelectedIndex(2);
 		playerColours[3].setSelectedIndex(3);
 		playerNames = new JTextField[]{new JTextField(20), new JTextField(20), new JTextField(20), new JTextField(20)};
-		
+
 		for (int i = 0; i < 4; i++) {
 			playerLabels[i].setSize(40, 20);
 			playerTypes[i].setSize(40, 20);
 			playerColours[i].setSize(40, 20);
 			playerNames[i].setSize(40, 20);
 		}
-		
+
 		playerDetailsPanel.add(new JLabel(""));
 		playerDetailsPanel.add(new JLabel(messages.getString("player")));
 		playerDetailsPanel.add(new JLabel(messages.getString("colour")));
 		playerDetailsPanel.add(new JLabel(messages.getString("name")));
-		
+
 		switch(gameMode.getSelectedItem().toString().substring(0, 1)){
 		case "2":
+			wallRules.setSelectedIndex(1);
 			playerDetailsPanel.setLayout(new GridLayout(3, 4, 20, 10));
 			playerDetailsPanel.setSize(400, 100);
 			for (int i = 0; i < 2; i++) {
@@ -194,8 +195,9 @@ public class NewGameView implements ViewPanel {
 			}
 			break;
 		case "4":
+			wallRules.setSelectedIndex(0);
 			playerDetailsPanel.setLayout(new GridLayout(5, 4, 20, 10));
-			playerDetailsPanel.setSize(400, 170);
+			playerDetailsPanel.setSize(400, 172);
 			for (int i = 0; i < 4; i++) {
 				playerDetailsPanel.add(playerLabels[i]);
 				playerTypes[i].addItemListener (new ItemListener () {
@@ -222,7 +224,7 @@ public class NewGameView implements ViewPanel {
 		playerTypes[3].setSelectedIndex(1);
 		getJPanel().updateUI();
 	}
-	
+
 	public void updatePlayerColourInputs(ItemEvent e){
 		active++;
 		if (active < 3){
@@ -241,7 +243,7 @@ public class NewGameView implements ViewPanel {
 			} else if (e.getStateChange() == ItemEvent.SELECTED){
 				for (int i = 0; i < 4; i++) {
 					if (e.getItem().toString().equals(playerColours[i].getSelectedItem().toString()) &&
-						i != playerNumberChange){
+							i != playerNumberChange){
 						playerColours[i].setSelectedIndex(playerColourChange);
 						break;
 					}
@@ -252,7 +254,7 @@ public class NewGameView implements ViewPanel {
 			active = 0;
 		}
 	}
-	
+
 	public void generateBotName(ItemEvent e){
 		if (e.getStateChange() == ItemEvent.SELECTED){
 			int playerID = -1;
@@ -262,29 +264,31 @@ public class NewGameView implements ViewPanel {
 					break;
 				}
 			}
-			if (playerTypes[playerID].getSelectedItem().toString().equals(messages.getString("bot_player"))){
-				playerNames[playerID].setText(messages.getString("bot")+(playerID+1));
+			if (playerTypes[playerID].getSelectedItem().toString().equals(messages.getString("computer_player"))){	
+				playerNames[playerID].setText(messages.getString("computer")+(playerID+1));
+				playerNames[playerID].setEnabled(false);
 			} else {
 				playerNames[playerID].setText(messages.getString("player")+(playerID+1));
+				playerNames[playerID].setEnabled(true);
 			}
 		}
 	}
-	
+
 	public Rules setupRules(){
 		Rules theRules = null;
 		int playerCount = 0;
 		int wallCount = 0;
 		String[] colours = null;
 		String[] names = null;
-		ArrayList<Integer> botIDs = new ArrayList<Integer>();
+		ArrayList<String> botIDs = new ArrayList<String>();
 		switch(gameMode.getSelectedItem().toString().substring(0, 1)){
 		case "2":
 			playerCount = 2;
 			colours = new String[]{playerColours[0].getSelectedItem().toString(), playerColours[1].getSelectedItem().toString()};
 			names = new String[]{playerNames[0].getText(), playerNames[1].getText()};
 			for (int i = 0; i < 2; i++) {
-				if (playerTypes[i].getSelectedItem().toString().equals(messages.getString("bot_player"))){
-					botIDs.add(i);
+				if (playerTypes[i].getSelectedItem().toString().equals(messages.getString("computer_player"))){
+					botIDs.add(playerNames[i].getText());
 				}
 			}
 			break;
@@ -293,8 +297,8 @@ public class NewGameView implements ViewPanel {
 			colours = new String[]{playerColours[0].getSelectedItem().toString(), playerColours[1].getSelectedItem().toString(), playerColours[2].getSelectedItem().toString(), playerColours[3].getSelectedItem().toString()};
 			names = new String[]{playerNames[0].getText(), playerNames[1].getText(), playerNames[2].getText(), playerNames[3].getText()};
 			for (int i = 0; i < 4; i++) {
-				if (playerTypes[i].getSelectedItem().toString().equals(messages.getString("bot_player"))){
-					botIDs.add(i);
+				if (playerTypes[i].getSelectedItem().toString().equals(messages.getString("computer_player"))){
+					botIDs.add(playerNames[i].getText());
 				}
 			}
 			break;
@@ -308,21 +312,21 @@ public class NewGameView implements ViewPanel {
 		theRules = new Rules(wallCount, playerCount, colours, names, botIDs, gameRules.getSelectedItem().toString());
 		return theRules;
 	}
-	
+
 	/**
 	 * Make the panel visible
 	 */
 	public void setVisible(){
 		panel.setVisible(true);
 	}
-	
+
 	/**
 	 * Add the panel to the GUI's main JFrame, positioned at CENTER
 	 */
 	public void addToJFrame() {
 		GUI.getJFrame().add(panel, BorderLayout.CENTER);
 	}
-	
+
 	/**
 	 * This method returns the main view panel
 	 * @return JPanel panel
@@ -330,5 +334,5 @@ public class NewGameView implements ViewPanel {
 	public JPanel getJPanel() {
 		return panel;
 	}
-	
+
 }

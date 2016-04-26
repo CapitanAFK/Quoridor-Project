@@ -82,7 +82,8 @@ public class GameView implements ViewPanel {
 	public GameView(Rules rules) {
 		// Initialise Game
 		controls = new Controls();
-		stats = new Statistics(rules.MAX_PLAYERS);
+		stats = new Statistics(rules);
+		
 		quoridor = new Quoridor(rules);
 		quoridor.beginGame();
 		turnTaken = null;
@@ -525,16 +526,19 @@ public class GameView implements ViewPanel {
 				coord = getCoordFromString();
 				quoridor.movePlayersPawn(quoridor.getPlayersTurn(),coord);
 				currentState = GameState.MovingPlayer;
+				stats.decrementStepsTaken((quoridor.getPlayersTurn()));
 				break;
 			case "Vall":
 				coord = getCoordFromString();
 				quoridor.removePlayerWall(coord, true);
 				currentState = GameState.PlacingVWall;
+				stats.decrementWallsPlaced((quoridor.getPlayersTurn()));
 				break;
 			case "Hall":
 				coord = getCoordFromString();
 				quoridor.removePlayerWall(coord, true);
 				currentState = GameState.PlacingHWall;
+				stats.decrementWallsPlaced((quoridor.getPlayersTurn()));
 				break;
 			case "Rall":
 				coord = getCoordFromString();
@@ -542,6 +546,7 @@ public class GameView implements ViewPanel {
 				boolean isHorizontal = getIsHorizontalFromString();
 				quoridor.addPlayerWall(player, coord, isHorizontal);
 				currentState = GameState.RemovingWall;
+				stats.decrementWallsRemoved((quoridor.getPlayersTurn()));
 				break;
 			}
 			stats.incrementUndosTaken(quoridor.getPlayersTurn());
@@ -581,11 +586,11 @@ public class GameView implements ViewPanel {
 		if (quoridor.checkBotsGo() == true){
 			currentState = GameState.BotsTurn;
 			quoridor.takeBotsTurn();
-			activateState();
-			updateButtons();
 			if (!checkEndGame()){
 				endPlayersTurn();
 			}
+			activateState();
+			updateButtons();
 		} else {
 			currentState = GameState.MovingPlayer;
 			activateState();
@@ -661,6 +666,15 @@ public class GameView implements ViewPanel {
 			break;
 		case "BotsTurn":
 			setWallGapsVisible(false);
+			break;
+		case "GameEnded":
+			stats.setWinner(quoridor.getPlayers()[quoridor.getPlayersTurn()].getPlayerName());
+			panel.setVisible(false);
+			StatsView sv = new StatsView(stats);
+			sv.addToJFrame();
+			sv.setVisible();
+			sv.getJPanel().setFocusable(true);
+			sv.getJPanel().requestFocusInWindow();
 			break;
 		}
 		getJPanel().requestFocus();
@@ -793,10 +807,10 @@ public class GameView implements ViewPanel {
 						checkEndGame();
 						activateState();
 						updateButtons();
+						stats.incrementStepsTaken((quoridor.getPlayersTurn()));
 						return true;
 					}
 				}
-				stats.incrementStepsTaken((quoridor.getPlayersTurn()));
 			}
 			break;
 		}
@@ -807,6 +821,7 @@ public class GameView implements ViewPanel {
 		if (quoridor.checkFinish(quoridor.getPlayersTurn(), quoridor
 				.getPlayers()[quoridor.getPlayersTurn()].getPawnLocation()) == true) {
 			currentState = GameState.GameEnded;
+			panel.setVisible(false);
 			return true;
 		}
 		return false;
@@ -945,40 +960,47 @@ public class GameView implements ViewPanel {
 	}
 
 	public Image getPlayersImage(int player) {
-		switch (quoridor.getPlayers()[player].getPawn().getColour()) {
-		case "Red":
+		String playerColour = quoridor.getPlayers()[player].getPawn().getColour();
+		String redColour = messages.getString("colour_red");
+		String blueColour = messages.getString("colour_blue");
+		String greenColour = messages.getString("colour_green");
+		String yellowColour = messages.getString("colour_yellow");
+		if (playerColour.equals(redColour)) {
 			return redPawnIMG;
-		case "Blue":
+		} else if (playerColour.equals(blueColour)) {
 			return bluePawnIMG;
-		case "Green":
+		} else if (playerColour.equals(greenColour)) {
 			return greenPawnIMG;
-		case "Yellow":
+		} else if (playerColour.equals(yellowColour)) {
 			return yellowPawnIMG;
 		}
 		return null;
 	}
 	
 	public Image getPlayersWallImage(int player, boolean isHorizontal) {
+		String playerColour = quoridor.getPlayers()[player].getPawn().getColour();
+		String redColour = messages.getString("colour_red");
+		String blueColour = messages.getString("colour_blue");
+		String greenColour = messages.getString("colour_green");
+		String yellowColour = messages.getString("colour_yellow");
 		if (isHorizontal){
-			switch (quoridor.getPlayers()[player].getPawn().getColour()) {
-			case "Red":
+			if (playerColour.equals(redColour)) {
 				return redHWallIMG;
-			case "Blue":
+			} else if (playerColour.equals(blueColour)) {
 				return blueHWallIMG;
-			case "Green":
+			} else if (playerColour.equals(greenColour)) {
 				return greenHWallIMG;
-			case "Yellow":
+			} else if (playerColour.equals(yellowColour)) {
 				return yellowHWallIMG;
 			}
 		} else {
-			switch (quoridor.getPlayers()[player].getPawn().getColour()) {
-			case "Red":
+			if (playerColour.equals(redColour)) {
 				return redVWallIMG;
-			case "Blue":
+			} else if (playerColour.equals(blueColour)) {
 				return blueVWallIMG;
-			case "Green":
+			} else if (playerColour.equals(greenColour)) {
 				return greenVWallIMG;
-			case "Yellow":
+			} else if (playerColour.equals(yellowColour)) {
 				return yellowVWallIMG;
 			}
 		}

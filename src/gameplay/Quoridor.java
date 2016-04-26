@@ -60,8 +60,8 @@ public class Quoridor {
 	}
 
 	public boolean checkBotsGo(){
-		for (int i = 0; i < rules.getBotPlayerIDs().size(); i++) {
-			if (playersTurn == rules.getBotPlayerIDs().get(i)){		
+		for (int i = 0; i < rules.getBotPlayerNames().size(); i++) {
+			if (models.getPlayers()[playersTurn].getPlayerName().equals(rules.getBotPlayerNames().get(i))){		
 				return true;
 			}
 		}
@@ -125,7 +125,7 @@ public class Quoridor {
 		int choice = random.nextInt(2);
 		if (choice == 1){
 			String wallAdded = "Invalid Move";
-			int distance = 0;
+			int distance = 1;
 			int playerToBlock = random.nextInt(rules.MAX_PLAYERS);
 			if (playerToBlock == playersTurn){
 				playerToBlock++;
