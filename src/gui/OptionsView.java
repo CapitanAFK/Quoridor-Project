@@ -13,7 +13,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 /**
- * This class creates the panel which displays the options menu
+ * This class creates the panel which displays the options menu, it allows the users to access key bindings and change the current langauge.
+ * 
+ * @author COMP7
+ * @version v1.0, 26/04/2016
  */
 public class OptionsView implements ViewPanel {
 	private JPanel panel; 
@@ -21,6 +24,10 @@ public class OptionsView implements ViewPanel {
 	
 	private JComboBox language;
 	
+	/**
+	 * Constructor method for the OptionsView class
+	 * It creates all of the components, sets their properties, layout managers and adds them to containers
+	 */
 	public OptionsView() {
 		// Set the current language
 		currentLanguage = new Language();
@@ -97,11 +104,14 @@ public class OptionsView implements ViewPanel {
 			}
 		});
 		
+		// When the user changes a language using the drop down menu save the language to a text file
+		// This keeps the language change even after closing and reopening the game
 		language.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				PrintWriter writer;
 				try {
 					writer = new PrintWriter("textFiles/currentLanguage.txt");
+					// Shorten each language to it's corresponding language "code"
 					if(language.getSelectedItem() == "English"){
 						writer.print("en");
 					} else if(language.getSelectedItem() == "Polish"){
@@ -117,9 +127,11 @@ public class OptionsView implements ViewPanel {
 				} catch (FileNotFoundException e1) {
 					System.out.println("No file found.");
 				}
+				
+				// Update the combo box to show the current language
 				updateComboBoxView();
 				
-				// Reload the screen
+				// Reload the screen so it's displayed in the chosen language
 				panel.setVisible(false);
 				OptionsView op = new OptionsView();
 				op.addToJFrame();

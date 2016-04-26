@@ -8,12 +8,19 @@ import javax.swing.*;
 
 /**
  * This class creates a GUI which allows the user to interact with the game.
- * It works by creating objects of appropriate classes and places them in the JFrame.
+ * By default the main menu screen opens when the game launches
+ * 
+ * @author COMP7
+ * @version v1.0, 26/04/2016
  */
 public class GUI {
 	private static JFrame frame;
 	private Language currentLanguage;
 
+	/**
+	 * Constructor for the GUI class
+	 * It initialises a JFrame and an object of class MainMenuView is passed to it
+	 */
 	public GUI() {	
 		// Set the current language
 		currentLanguage = new Language();
@@ -41,6 +48,11 @@ public class GUI {
 		frame.setVisible(true);
 	}
 
+	/**
+	 * Main method which creates a single objects of class GUI
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		GUI gui = new GUI();
 	}

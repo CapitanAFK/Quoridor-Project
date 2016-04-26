@@ -15,7 +15,10 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 /**
- * This class creates a JPanel which will display a new to allow the user to setup a new game.
+ * This class creates a JPanel which allows the user to set conditions to create a new game, that information is passed in a constructor
+ * 
+ * @author COMP7
+ * @version v1.0, 26/04/2016
  */
 public class NewGameView implements ViewPanel {
 	private JPanel panel;
@@ -42,7 +45,10 @@ public class NewGameView implements ViewPanel {
 	private int playerNumberChange;
 	private int active = 0;
 
-
+	/**
+	 * Constructor method for the NewGameView class
+	 * It creates all of the components, sets their properties, layout managers and adds them to containers
+	 */
 	public NewGameView() {	
 		// Set the current language
 		currentLanguage = new Language();
@@ -139,6 +145,7 @@ public class NewGameView implements ViewPanel {
 				mm.setVisible();
 			}
 		});
+		
 		gameMode.addActionListener (new ActionListener () {
 			public void actionPerformed(ActionEvent e) {
 				updatePlayerInputs();

@@ -7,18 +7,20 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-// IMPORTANT
-// ADDING A NEW LANGUAGE CHECKLIST
-// 1. language_{}.{}.properties
-// 2. setCountry(); add to the if statement
-// 3. in OptionsView:
-//	a. language.addActionListener(); add to the if statement
-//  b. updateComboBoxView(); add to the if statement
-//  c. add to languages array
-// 4. Add images
-
 /**
  * Class responsible for detecting the current language
+ * 
+ * ADDING A NEW LANGUAGE CHECKLIST:
+ * 1. language_{}.{}.properties
+ * 2. setCountry(); add to the if statement
+ * 3. in OptionsView:
+ *  a. language.addActionListener(); add to the if statement
+ *  b. updateComboBoxView(); add to the if statement
+ *  c. add to languages array
+ * 4. Add images
+ * 
+ * @author COMP7
+ * @version v1.0, 26/04/2016
  */
 public class Language {
 	protected String language;
@@ -26,7 +28,11 @@ public class Language {
 	protected Locale currentLocale;
 	protected ResourceBundle messages;
 
+	/**
+	 * Constructor for the class Language
+	 */
 	public Language() {
+		// Set the language and the country
 		setLanguage();
 		setCountry();
 
@@ -35,14 +41,27 @@ public class Language {
 		messages = ResourceBundle.getBundle("language", currentLocale);
 	}
 
+	/**
+	 * Return the current language
+	 * 
+	 * @return String language
+	 */
 	public String getLanguage() {
 		return language;
 	}
 
+	/**
+	 * Return the current resource bundle
+	 * 
+	 * @return ResourceBundle messages
+	 */
 	public ResourceBundle getMessages() {
 		return messages;
 	}
 
+	/**
+	 * This method reads the text file which holds the current language and based on that text file it sets the game's language
+	 */
 	public void setLanguage() {
 		// This will reference one line at a time
 		String line = null;
@@ -76,8 +95,10 @@ public class Language {
 		}
 	}
 
+	/**
+	 * This method sets the current country based on the current language
+	 */
 	public void setCountry() {
-		// Set the country based on the language	
 		if (language == null) {
 			language = "en";
 			country = "GB";

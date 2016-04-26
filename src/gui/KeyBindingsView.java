@@ -16,21 +16,25 @@ import java.io.PrintWriter;
 import java.util.ResourceBundle;
 
 /**
- * This class creates the panel which displays the key bindings and allows the
- * user to change them
+ * This class creates the panel which displays the key bindings and allows the user to change them
+ * The key bindings are saved in a text file which keeps the users' preferences between closing and reopening the game
+ * 
+ * @author COMP7
+ * @version v1.0, 26/04/2016
  */
 public class KeyBindingsView implements ViewPanel {
 	private JPanel panel;
 	private String keyToChange;
 	private Controls controls;
 	
+	// Keys
 	private int keyCode;
 	private char key;
 	public String keyPressed;
 	
 	private Language currentLanguage;
 	
-	//Buttons
+	// Buttons
 	private final JButton backButton = new JButton();
 	private final JButton upButton = new JButton();
 	private final JButton downButton = new JButton();
@@ -42,6 +46,10 @@ public class KeyBindingsView implements ViewPanel {
 	private final JButton undoButton = new JButton();
 	private final JButton endTurnButton = new JButton();
 	
+	/**
+	 * Constructor method for the KeyBindingsView class
+	 * It creates all of the components, sets their properties, layout managers and adds them to containers
+	 */
 	public KeyBindingsView() {
 		// Set the current language
 		currentLanguage = new Language();
@@ -249,6 +257,10 @@ public class KeyBindingsView implements ViewPanel {
 		GUI.getJFrame().add(panel, BorderLayout.CENTER);
 	}
 
+	/**
+	 * This method checks if the user has pressed they key, if so then record which key and convert it into a string so that it can be 
+	 * saved in a text file
+	 */
 	public void checkKeyStroke(){
     	KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
 			
@@ -296,6 +308,9 @@ public class KeyBindingsView implements ViewPanel {
     	});
     }	
 	
+	/**
+	 * Save the new key to the text file
+	 */
 	public void updateControlsFile(){
 		PrintWriter writer;	
 		try {
@@ -316,6 +331,9 @@ public class KeyBindingsView implements ViewPanel {
 		}
 	}
 	
+	/**
+	 * Update the display on the buttons to show the current key
+	 */
 	public void updateButtons(){
 		upButton.setText(controls.getUp());
 		downButton.setText(controls.getDown());

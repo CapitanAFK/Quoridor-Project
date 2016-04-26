@@ -27,8 +27,11 @@ import model.Wall;
 import model.Board.BoardLocation;
 
 /**
- * This class creates the panel which is displayed when the player plays the
- * game.
+ * This class is responsible for creating a JPanel which displays a number of buttons and labels to provide a GUI for the user.
+ * The class also displays the board, pawns, walls and valid moves which the player can make.
+ * 
+ * @author COMP7
+ * @version v1.0, 26/04/2016
  */
 public class GameView implements ViewPanel {
 	private Controls controls;
@@ -87,7 +90,8 @@ public class GameView implements ViewPanel {
 		quoridor = new Quoridor(rules);
 		quoridor.beginGame();
 		turnTaken = null;
-		// setup Images
+		
+		// Setup Images
 		try {
 			squareIMG = ImageIO.read(new File("Images/squares/Square.png"));
 			squareHighlightedIMG = ImageIO.read(new File("Images/squares/SquareHighlight.png"));
@@ -110,7 +114,7 @@ public class GameView implements ViewPanel {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-
+		
 		squareIMG = squareIMG.getScaledInstance(62, 62,
 				BufferedImage.TYPE_INT_ARGB);
 		squareHighlightedIMG = squareHighlightedIMG.getScaledInstance(62, 62,
@@ -222,7 +226,8 @@ public class GameView implements ViewPanel {
 
 		// Setup Board Squares
 		boardWallGaps = new JLabel[8][8];
-
+		
+		// Loop through an array adding wall gaps to it as a JLabel
 		for (int x = 0; x < 8; x++) {
 			for (int y = 0; y < 8; y++) {
 				boardWallGaps[x][y] = new JLabel();
@@ -250,7 +255,7 @@ public class GameView implements ViewPanel {
 
 		for (int x = 1; x < 18; x++) {
 			for (int y = 1; y < 18; y++) {
-				// checks if x is even and y is not even, then sets it as Gap
+				// Checks if x is even and y is not even, then sets it as Gap
 				// Object
 				if ((x % 2 == 0) && (y % 2 != 0)) {
 					boardLocations[x - 1][y - 1] = new JLabel();
@@ -266,7 +271,7 @@ public class GameView implements ViewPanel {
 							});
 					boardPanel.add(boardLocations[x - 1][y - 1]);
 				}
-				// checks if x is not even and y is even, then sets it as Gap
+				// Checks if x is not even and y is even, then sets it as Gap
 				// Object
 				if ((x % 2 != 0) && (y % 2 == 0)) {
 					boardLocations[x - 1][y - 1] = new JLabel();

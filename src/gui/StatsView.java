@@ -15,12 +15,26 @@ import javax.swing.border.EmptyBorder;
 
 import gameplay.Statistics;
 
+/**
+ * This class creates a JPanel which displays the statistics screen at the end of each game.
+ * The class retrieves all of the information from the Statistics class.
+ * The class also loads the high scores text file, compares the winner's score and if appropriate append it to the file; keeping only top 10.
+ * 
+ * @author COMP7
+ * @version v1.0, 26/04/2016
+ */
 public class StatsView implements ViewPanel {
 	private JPanel panel;
 	private Language currentLanguage = new Language();
 	private ResourceBundle messages = currentLanguage.getMessages();
 	private Statistics stats;
 
+	/**
+	 * Constructor method for the StatsView class
+	 * It creates all of the components, sets their properties, layout managers and adds them to containers
+	 * 
+	 * @param Statistics stats
+	 */
 	public StatsView(Statistics stats) {
 		this.stats = stats;
 		// Create the components
@@ -45,7 +59,7 @@ public class StatsView implements ViewPanel {
 		JTable table = getTable();
 		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane.setBorder(new EmptyBorder(0,30,0,30));
-
+		
 		// Specify LayoutManagers
 		panel.setLayout(new BorderLayout());
 		statsPanel.setLayout(new BorderLayout());
@@ -60,7 +74,6 @@ public class StatsView implements ViewPanel {
 		panel.add(statsPanel);
 
 		// Events
-
 		mainMenuButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				panel.setVisible(false);
@@ -70,6 +83,7 @@ public class StatsView implements ViewPanel {
 			}
 		});
 
+		// Update the high scores
 		updateHighScores();
 	}
 
@@ -77,7 +91,7 @@ public class StatsView implements ViewPanel {
 		boolean[] isBot = stats.getIsBot();
 		String winnerName = stats.getWinnerId();
 		String[] playerNames = stats.getPlayerNames();
-		
+
 		int winnerID = 0;
 		for (int i = 0; i < playerNames.length; i++) {
 			if (winnerName.equals(playerNames)){
@@ -89,7 +103,7 @@ public class StatsView implements ViewPanel {
 		if (isBot[winnerID] == true){
 			skipUpdate = true;
 		}
-		
+
 		if (skipUpdate == false){
 			int wallsPlaced = stats.getWallsPlaced()[winnerID];
 			int stepsTaken = stats.getStepsTaken()[winnerID];
@@ -116,17 +130,17 @@ public class StatsView implements ViewPanel {
 			}
 		}
 	}
-	
+
 	public String[][] compareHighScores(String[] score){
 		try {
 			// Read the file
 			FileReader fr = new FileReader("textFiles/highScores.txt");
-			
+
 			// Wrap FileReader in BufferedReader
 			BufferedReader br = new BufferedReader(fr);	
-			
+
 			String[][] scores = new String[10][2];
-			
+
 			String line;
 			int x = 0;
 			while ((line = br.readLine()) != null ){
@@ -155,7 +169,7 @@ public class StatsView implements ViewPanel {
 			} else {
 				return null;
 			}
-			
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -163,23 +177,37 @@ public class StatsView implements ViewPanel {
 		return null;
 	}
 
+	/**
+	 * This method creates a table which displays the game's statistics
+	 * 
+	 * @return JTable table
+	 */
 	public JTable getTable(){
+		// Create the headings
 		String[] columnNames = { messages.getString("name"), messages.getString("walls_placed"),
 				messages.getString("steps_taken"), messages.getString("undos_taken"), messages.getString("walls_removed")};
 
 		String[] playerNames = stats.getPlayerNames();
 		boolean[] isBot = stats.getIsBot();
 		int playerCount = 0;
+		
+		// Check how many of the players were human players
 		for (int i = 0; i < playerNames.length; i++) {
 			if (isBot[i] == false){
 				playerCount++;
 			}
 		}
+		
+		// Retrieve data from the Statistics class
 		int[] wallsPlaced = stats.getWallsPlaced();
 		int[] stepsTaken = stats.getStepsTaken();
 		int[] undosTaken = stats.getUndosTaken();
 		int[] wallsRemoved = stats.getWallsRemoved();
+		
+		// Create a 2D array for the data
 		Object[][] data = new Object[playerCount][5];
+		
+		// Add human players' data only
 		for (int i = 0; i < playerCount; i++) {
 			if (isBot[i] == false){
 				data[i][0] = playerNames[i];
@@ -190,20 +218,32 @@ public class StatsView implements ViewPanel {
 			}
 		}
 
+		// Create the table and make it non-editable
 		JTable table = new JTable(data, columnNames);
 		table.setEnabled(false);
-
+		
 		return table;
 	}
 
+	/**
+	 * Return the JPanel
+	 * 
+	 * @return JPanel panel
+	 */
 	public JPanel getJPanel() {
 		return panel;
 	}
 
+	/**
+	 * Set the panel visible
+	 */
 	public void setVisible() {
 		panel.setVisible(true);
 	}
 
+	/**
+	 * Add the panel to the JFrame at its center
+	 */
 	public void addToJFrame() {
 		GUI.getJFrame().add(panel, BorderLayout.CENTER);
 	}

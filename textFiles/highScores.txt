@@ -16,5 +16,5 @@ Shuaa
 10
 Player1
 7
-Mini
-5
+Player1
+7
