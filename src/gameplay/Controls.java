@@ -13,6 +13,7 @@ import java.io.IOException;
  * @version v1.0, 26/04/2016
  */
 public class Controls {
+	/** The string variables used to represent the shortcuts*/
 	public String moveLeft = "A";
 	public String moveRight = "D";
 	public String moveUp = "W";
