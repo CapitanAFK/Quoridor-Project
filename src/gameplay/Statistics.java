@@ -1,5 +1,7 @@
 package gameplay;
 
+import java.util.ArrayList;
+
 
 public class Statistics {
 	private int[] wallsPlaced;
@@ -17,17 +19,19 @@ public class Statistics {
 		undosTaken = new int[players];
 		wallsRemoved = new int[players];
 		isBot = new boolean[players];
+		for (boolean b : isBot) {
+			b = false;
+		}
 		playerNames = rules.getPlayerNames();
-		for (int i = 0; i < players; i++) {
-			InnerLoop:
-			for (int j = 0; j < rules.getBotPlayerNames().size(); j++) {
-				if (rules.getBotPlayerNames().get(j).equals(playerNames[i])){
+		ArrayList<String> botNames = rules.getBotPlayerNames();
+		int i = 0;
+		for (String player : playerNames) {
+			for (String bot : botNames) {
+				if (player.equals(bot)){
 					isBot[i] = true;
-				} else {
-					isBot[i] = false;
 				}
-				break InnerLoop;
 			}
+			i++;
 		}
 	}
 	
