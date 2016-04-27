@@ -110,6 +110,10 @@ public class Board{
 		}
 	}
 	
+	/**
+	 * loops through the coordinates of the board and returns the a string representation of it
+	 * @return the string representation of the board
+	 */
 	public String toString(){
 		StringBuilder sb = new StringBuilder();
 		for (int x = 0; x < 17; x++) {

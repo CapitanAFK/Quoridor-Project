@@ -49,6 +49,12 @@ public class Coordinate {
 		this.y = y;
 	}
 	
+	/**
+	 * fetches the coordinate of the wall to be returned in the given direction from this coordinate
+	 * this coordinate will most likely be a square coordinate
+	 * @param direction - the string to determine the direction of the coordinate to be given  
+	 * @return the coordinate of the wall in the given direction
+	 */
 	public Coordinate getWall(String direction){
 		switch (direction){
 		case "north":return new Coordinate(x,y-1);
@@ -59,6 +65,12 @@ public class Coordinate {
 		return null;
 	}
 	
+	/**
+	 * fetches the coordinate of the square to be returned in the given direction from this coordinate
+	 * this coordinate will most likely be a square coordinate
+	 * @param direction - the string to determine the direction of the coordinate to be given  
+	 * @return the coordinate of the square in the given direction from this square
+	 */
 	public Coordinate getSquare(String direction){
 		switch (direction){
 		case "north":return new Coordinate(x,y-2);
@@ -69,10 +81,18 @@ public class Coordinate {
 		return null;
 	}
 	
+	/**
+	 * @return a string representation of this object
+	 */
 	public String toString(){
 		return x+","+y+" ";
 	}
 	
+	/**
+	 * compares two coordinates and returns true if they are the same
+	 * @param coord - the coordinate being compared to this coordinate
+	 * @return the boolean stating if the coordinates match
+	 */
 	public boolean compare(Coordinate coord){
 		boolean equal = false;
 		if (coord.getX() == x && coord.getY() == y){

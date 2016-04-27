@@ -7,6 +7,7 @@ import java.util.ArrayList;
  * Player.java - a class to describe the properties and functionality of a Player object
  */
 public class Player {
+	/** defines the players name*/	
 	private String playerName;
 	/** defines the maximum amount of walls the Player is allowed to place */
 	private final int MAX_WALL_LIMIT;
@@ -52,17 +53,24 @@ public class Player {
 	
 	/**
 	 * updates the current position of the Player's Pawn object
+	 * @param position - the coordinate the pawn will be moved to
 	 */
 	public void movePawn(Coordinate position){
 		pawn.setPosition(position);
 	}
 	
 	
-	
+	/**
+	 * @return the Player's Name
+	 */
 	public String getPlayerName() {
 		return playerName;
 	}
 
+	/**
+	 * sets the Player's name
+	 * @param playerName - the string the Player's name will be set as
+	 */
 	public void setPlayerName(String playerName) {
 		this.playerName = playerName;
 	}
@@ -74,10 +82,15 @@ public class Player {
 		return pawn;
 	}
 	
+	/**
+	 * @return the number of walls the player has left to place
+	 */
 	public int getWallsLeft(){
 		return MAX_WALL_LIMIT-wallsPlaced.size();
 	}
-
+	/**
+	 * @return the array of walls the player has placed
+	 */ 
 	public ArrayList<Wall> getWallsPlaced() {
 		return wallsPlaced;
 	}
