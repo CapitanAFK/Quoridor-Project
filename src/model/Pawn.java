@@ -3,7 +3,10 @@ package model;
 import java.awt.Color;
 
 /**
- * Pawn.java - a simple class to describe the properties of a Pawn object
+ * A simple class to describe the properties of a Pawn object
+ * 
+ * @author COMP7
+ * @version v1.0, 26/04/2016
  */
 public class Pawn {
 	/** defines Coordinate location of the Pawn object on the game board */

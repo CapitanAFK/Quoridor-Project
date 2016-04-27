@@ -1,7 +1,10 @@
 package model;
 
-/**
- * Wall.java - a simple class to describe the properties of a Wall object
+ /**
+ * This class describes the properties a wall object
+ * 
+ * @author COMP7
+ * @version v1.0, 26/04/2016
  */
 public class Wall {
 	/** defines the Coordinate location of the Wall on the game board */

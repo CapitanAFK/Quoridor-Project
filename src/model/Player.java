@@ -4,7 +4,10 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 /**
- * Player.java - a class to describe the properties and functionality of a Player object
+ * A class to describe the properties and functionality of a Player object
+ * 
+ * @author COMP7
+ * @version v1.0, 26/04/2016
  */
 public class Player {
 	/** defines the players name*/	

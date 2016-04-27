@@ -1,7 +1,10 @@
 package model;
 
 /**
- * ModelFacade.java - A facade which passes objects to and from the models.
+ *  A facade class which passes objects to and from the model objects.
+ * 
+ * @author COMP7
+ * @version v1.0, 26/04/2016
  */
 public class ModelFacade {
 	/** The board model being used for the game */

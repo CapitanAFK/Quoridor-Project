@@ -4,7 +4,11 @@ import java.awt.Color;
 import java.util.Random;
 
 /**
- * Board.java - a class to describe the properties and functionality of the Board object
+ * A class to describe the properties of the Board object.
+ * Provides functionality for validating moves made on the board in the game.
+ *
+ * @author COMP7
+ * @version v1.0, 26/04/2016
  */
 public class Board{
 	/** setup location ID's */

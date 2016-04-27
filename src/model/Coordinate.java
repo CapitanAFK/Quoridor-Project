@@ -1,7 +1,11 @@
 package model;
 
 /**
- * Coordinate.java - a simple class to define the properties for a Coordinate object
+ * A simple class to define the properties for a Coordinate object.
+ * Provides functionality for comparing coordinates and getting neighbouring coordinates.
+ *
+ * @author COMP7
+ * @version v1.0, 26/04/2016
  */
 public class Coordinate {
 	/** defines the x location of the coordinate */
