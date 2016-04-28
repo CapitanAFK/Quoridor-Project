@@ -51,7 +51,7 @@ public class HighScoreView implements ViewPanel{
 
 		highScores = getHighScore();
 		scrollPaneHighScore = new JScrollPane(highScores);
-		scrollPaneHighScore.setBorder(new EmptyBorder(0,100,130,100));
+		scrollPaneHighScore.setBorder(new EmptyBorder(0,100,125,100));
 
 		// Specify LayoutManagers
 		panel.setLayout(new BorderLayout());

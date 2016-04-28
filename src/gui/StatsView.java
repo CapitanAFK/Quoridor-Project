@@ -91,7 +91,11 @@ public class StatsView implements ViewPanel {
 		updateHighScores();
 	}
 
+	/**
+	 * updates the high scores if the winning players score is a new high score
+	 */
 	public void updateHighScores(){
+		//gets the winners stats
 		boolean[] isBot = stats.getIsBot();
 		String winnerName = stats.getWinnerId();
 		String[] playerNames = stats.getPlayerNames();
@@ -103,24 +107,29 @@ public class StatsView implements ViewPanel {
 				break;
 			}
 		}
+		//wont update if the winner is a bot
 		boolean skipUpdate = false;
 		if (isBot[winnerID] == true){
 			skipUpdate = true;
 		}
 
 		if (skipUpdate == false){
+			//fetches the winners stats for the game
 			int wallsPlaced = stats.getWallsPlaced()[winnerID];
 			int stepsTaken = stats.getStepsTaken()[winnerID];
 			int undosTaken = stats.getUndosTaken()[winnerID];
 			int wallsRemoved = stats.getWallsRemoved()[winnerID];
+			//generates a score based on the players results
 			int score = (wallsPlaced+stepsTaken+wallsRemoved)-undosTaken;
 			String[] playerScore = new String[2];
 			playerScore[0] = playerNames[winnerID];
 			playerScore[1] = score+"";
+			//compares the winners scores to the previous scores
 			String[][] allScores = compareHighScores(playerScore);
 			if (allScores != null){
 				PrintWriter writer;	
 				try {
+					//saves the high scores to the high scores files
 					writer = new PrintWriter("textFiles/highScores.txt");
 					for (int i = 0; i < allScores.length; i++){
 						writer.println(allScores[i][0]);
@@ -135,6 +144,13 @@ public class StatsView implements ViewPanel {
 		}
 	}
 
+	/**
+	 * Loads the high scores to an array.
+	 * Compares the winners' scores to the previous scores.
+	 * Adds the players score to high scores if they beat it
+	 * @param score - the array of the winners' name and score
+	 * @return the array of names and high scores.
+	 */
 	public String[][] compareHighScores(String[] score){
 		try {
 			// Read the file
@@ -147,6 +163,7 @@ public class StatsView implements ViewPanel {
 
 			String line;
 			int x = 0;
+			//loads the high scores to an array
 			while ((line = br.readLine()) != null ){
 				scores[x][0] = line;
 				scores[x][1] = br.readLine();
@@ -154,6 +171,7 @@ public class StatsView implements ViewPanel {
 			}
 			boolean update = false;
 			String[][] tempScores = new String[10][2];
+			//updates the scores if the new score is better than them
 			for (int i = 0; i < scores.length; i++) {
 				tempScores[i] = scores[i];
 				if (scores[i][0] != null){
@@ -168,6 +186,7 @@ public class StatsView implements ViewPanel {
 					}
 				}
 			}
+			//returns the scores if they need to be updated
 			if (update == true){
 				return scores;
 			} else {

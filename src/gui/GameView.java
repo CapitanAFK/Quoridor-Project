@@ -82,6 +82,10 @@ public class GameView implements ViewPanel {
 	
 	private Statistics stats;
 
+	/**
+	 * The constructor for GameView 
+	 * @param rules - the rules being used for the current game
+	 */
 	public GameView(Rules rules) {
 		// Initialise Game
 		controls = new Controls();
@@ -152,6 +156,7 @@ public class GameView implements ViewPanel {
 		yellowPawnIMG = yellowPawnIMG.getScaledInstance(62, 62,
 				BufferedImage.TYPE_INT_ARGB);
 
+		//Creates the buttons for the GUI
 		exitButton = new JButton();
 		vWall = new JButton();
 		hWall = new JButton();
@@ -231,7 +236,7 @@ public class GameView implements ViewPanel {
 		// Setup Board Squares
 		boardWallGaps = new JLabel[8][8];
 		
-		// Loop through an array adding wall gaps to it as a JLabel
+		// Loops through an array adding invisible wall gaps to it as a JLabel with mouse event functionality
 		for (int x = 0; x < 8; x++) {
 			for (int y = 0; y < 8; y++) {
 				boardWallGaps[x][y] = new JLabel();
@@ -257,6 +262,7 @@ public class GameView implements ViewPanel {
 
 		boardLocations = new JLabel[17][17];
 
+		//Loops through the array boardLocations and sets them as Jlabels with mouse event functionality to represent the gaps between squares of the board
 		for (int x = 1; x < 18; x++) {
 			for (int y = 1; y < 18; y++) {
 				// Checks if x is even and y is not even, then sets it as Gap
@@ -294,6 +300,7 @@ public class GameView implements ViewPanel {
 			}
 		}
 
+		//Loops through the array boardLocations and sets them as Jlabels with mouse event functionality to represent the squares of the board
 		for (int x = 1; x < 18; x++) {
 			for (int y = 1; y < 18; y++) {
 				// checks if x is not even and y is not even, then sets it as
@@ -373,6 +380,7 @@ public class GameView implements ViewPanel {
 			public void keyReleased(KeyEvent e) {
 			}
 
+			//key press events
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (currentState != GameState.GameEnded) {
@@ -470,6 +478,9 @@ public class GameView implements ViewPanel {
 		checkBotPlayer();
 	}
 
+	/**
+	 * Loops through the array boardWallGaps and turns them visible
+	 */
 	public void setWallGapsVisible(boolean visible) {
 		for (int x = 0; x < 8; x++) {
 			for (int y = 0; y < 8; y++) {
@@ -478,6 +489,10 @@ public class GameView implements ViewPanel {
 		}
 	}
 
+	/**
+	 * Parses the turnTaken string and fetches the coordinate mentioned
+	 * @return the Coordinate generated from the method
+	 */
 	public Coordinate getCoordFromString() {
 		boolean change = false;
 		int i = 5;
@@ -498,6 +513,10 @@ public class GameView implements ViewPanel {
 		return new Coordinate(Integer.parseInt(x), Integer.parseInt(y));
 	}
 	
+	/**
+	 * Parses the turnTaken string and fetches the players int of who mentioned
+	 * @return the integer representing the player
+	 */
 	public int getPlayerFromString() {
 		int player = 0;
 		int i = 4;
@@ -511,6 +530,10 @@ public class GameView implements ViewPanel {
 		return player;
 	}
 	
+	/**
+	 * Parses the turnTaken string and fetches a boolean stating if the wall mentioned is horizontal or vertical
+	 * @return the boolean stating if the wall mentioned is horizontal or vertical
+	 */
 	public boolean getIsHorizontalFromString() {
 		boolean isHorizontal = false;
 		int i = 4;
@@ -527,28 +550,36 @@ public class GameView implements ViewPanel {
 		return isHorizontal;
 	}
 
+	/**
+	 * The method used for undoing the players last turn
+	 */
 	public void undoPlayersMove() {
+		//checks the player has taken their turn
 		if(turnTaken.length() != 0){
 			Coordinate coord;
 			switch (turnTaken.substring(0, 4)) {
+				//undoes a players pawn move
 			case "Pawn":
 				coord = getCoordFromString();
 				quoridor.movePlayersPawn(quoridor.getPlayersTurn(),coord);
 				currentState = GameState.MovingPlayer;
 				stats.decrementStepsTaken((quoridor.getPlayersTurn()));
 				break;
+				//undoes a players vertical wall placement
 			case "Vall":
 				coord = getCoordFromString();
 				quoridor.removePlayerWall(coord, true);
 				currentState = GameState.PlacingVWall;
 				stats.decrementWallsPlaced((quoridor.getPlayersTurn()));
 				break;
+				//undoes a players horizontal wall placement
 			case "Hall":
 				coord = getCoordFromString();
 				quoridor.removePlayerWall(coord, true);
 				currentState = GameState.PlacingHWall;
 				stats.decrementWallsPlaced((quoridor.getPlayersTurn()));
 				break;
+				//undoes a players wall removal
 			case "Rall":
 				coord = getCoordFromString();
 				int player = getPlayerFromString();
@@ -565,32 +596,51 @@ public class GameView implements ViewPanel {
 		}
 	}
 
+	/**
+	 * Changes the game state to placing a horizontal wall
+	 */
 	public void hWallSelected() {
 		currentState = GameState.PlacingHWall;
 		activateState();
 	}
 
+	/**
+	 * Changes the game state to placing a vertical wall
+	 */
 	public void vWallSelected() {
 		currentState = GameState.PlacingVWall;
 		activateState();
 	}
 	
+	/**
+	 * Changes the game state to removing a players wall
+	 */
 	public void removePlayersWall(){
 		currentState = GameState.RemovingWall;
 		activateState();
 	}
 
+	/**
+	 * Changes the game state to moving a players pawn
+	 */
 	public void movePlayerSelected() {
 		currentState = GameState.MovingPlayer;
 		activateState();
 	}
 
+	/**
+	 * Ends the current players turn
+	 */
 	public void endPlayersTurn() {
 		quoridor.endPlayersTurn();
 		turnTaken = null;
 		checkBotPlayer();
 	}
 	
+	/**
+	 * Checks if the current player is a computer player
+	 * Takes the computer players turn then ends it turn
+	 */
 	public void checkBotPlayer(){
 		if (quoridor.checkBotsGo() == true){
 			currentState = GameState.BotsTurn;
@@ -607,6 +657,9 @@ public class GameView implements ViewPanel {
 		}
 	}
 
+	/**
+	 * Enables/Disables the game buttons depending on the game state
+	 */
 	public void updateButtons() {
 		if (currentState == GameState.GameEnded) {
 			vWall.setEnabled(false);
@@ -643,10 +696,14 @@ public class GameView implements ViewPanel {
 		}
 	}
 
+	/**
+	 * Activates all the elements associated with the current state
+	 */
 	public void activateState() {
 		updateBoardDisplay();
 		switch (currentState.toString()) {
 		case "MovingPlayer":
+			//fetches all the valid moves for the current player and updates the board to show them
 			setWallGapsVisible(false);
 			validMoves = quoridor.getValidMoves();
 			for (int i = 0; i < validMoves.size(); i++) {
@@ -677,6 +734,7 @@ public class GameView implements ViewPanel {
 			setWallGapsVisible(false);
 			break;
 		case "GameEnded":
+			//ends the game and changes the panel to the statistics view
 			stats.setWinner(quoridor.getPlayers()[quoridor.getPlayersTurn()].getPlayerName());
 			panel.setVisible(false);
 			StatsView sv = new StatsView(stats);
@@ -689,6 +747,11 @@ public class GameView implements ViewPanel {
 		getJPanel().requestFocus();
 	}
 
+	/**
+	 * finds the model coordiates associated with the JLabel clicked
+	 * @param e - the mouse event which triggered this method
+	 * @return the model coordinate associated with the board square clicked
+	 */
 	public Coordinate getSquareCoordinates(MouseEvent e) {
 		for (int x = 0; x < 17; x++) {
 			for (int y = 0; y < 17; y++) {
@@ -700,6 +763,11 @@ public class GameView implements ViewPanel {
 		return null;
 	}
 
+	/**
+	 * finds the model coordiates associated with the JLabel clicked
+	 * @param e - the mouse event which triggered this method
+	 * @return the model coordinate associated with the board wall gap clicked
+	 */
 	public Coordinate getWallGapCoordinates(MouseEvent e) {
 		for (int x = 0; x < 8; x++) {
 			for (int y = 0; y < 8; y++) {
@@ -711,11 +779,17 @@ public class GameView implements ViewPanel {
 		return null;
 	}
 
+	/**
+	 * The method which processes wall placements
+	 * @param e - the mouse event that triggered this method
+	 */
 	public void wallGapClicked(MouseEvent e) {
 		Coordinate gapCoord = getWallGapCoordinates(e);
 		Coordinate boardCoord = convertVGtoMG(gapCoord);
+		//produces a different outcome depending on the current game state
 		switch (currentState.toString()) {
 		case "PlacingHWall":
+			//Places a horizontal wall
 			if (quoridor.addPlayerWall(quoridor.getPlayersTurn(), boardCoord, true) == "Wall Placed") {
 				currentState = GameState.TurnTaken;
 				turnTaken = "Hall " + boardCoord.toString();
@@ -724,6 +798,7 @@ public class GameView implements ViewPanel {
 				stats.incrementWallsPlaced(quoridor.getPlayersTurn());
 			}
 			break;
+			//Places a vertical wall
 		case "PlacingVWall":
 			if (quoridor.addPlayerWall(quoridor.getPlayersTurn(), boardCoord, false) == "Wall Placed") {
 				currentState = GameState.TurnTaken;
@@ -734,6 +809,7 @@ public class GameView implements ViewPanel {
 			}
 			break;
 		case "RemovingWall":
+			//Removes a vertical wall
 			String outcome = quoridor.removePlayerWall(boardCoord, false);
 			if (outcome.substring(5).equals("Wall Removed")){
 				currentState = GameState.TurnTaken;
@@ -746,10 +822,15 @@ public class GameView implements ViewPanel {
 		}
 	}
 
+	/**
+	 * The method generates a ghost of a wall at the location of the board wall gap
+	 * @param e - the mouse event that triggered this method
+	 */
 	public void showMouseHover(MouseEvent e) {
 		Coordinate gapCoord = getWallGapCoordinates(e);
 		Coordinate boardCoord = convertVGtoMG(gapCoord);
 		switch (currentState.toString()) {
+		//shows a horizontal wall
 		case "PlacingHWall":
 			if (quoridor.checkFreeWallGap(boardCoord, true)) {
 				boardLocations[boardCoord.getWall("east").getX()][boardCoord
@@ -758,6 +839,7 @@ public class GameView implements ViewPanel {
 						.getY()].setIcon(new ImageIcon(hoverHWallIMG));
 			}
 			break;
+		//shows a vertical wall
 		case "PlacingVWall":
 			if (quoridor.checkFreeWallGap(boardCoord, false)) {
 				boardLocations[boardCoord.getX()][boardCoord.getWall("north")
@@ -769,10 +851,15 @@ public class GameView implements ViewPanel {
 		}
 	}
 
+	/**
+	 * The method hides a ghost of a wall at the location of the board wall gap
+	 * @param e - the mouse event that triggered this method
+	 */
 	public void hideMouseHover(MouseEvent e) {
 		Coordinate gapCoord = getWallGapCoordinates(e);
 		Coordinate boardCoord = convertVGtoMG(gapCoord);
 		switch (currentState.toString()) {
+		//hides the horizontal wall
 		case "PlacingHWall":
 			if (quoridor.checkFreeWallGap(boardCoord, true)) {
 				boardLocations[boardCoord.getWall("east").getX()][boardCoord
@@ -781,6 +868,7 @@ public class GameView implements ViewPanel {
 						.getY()].setIcon(null);
 			}
 			break;
+		//hides the vertical wall
 		case "PlacingVWall":
 			if (quoridor.checkFreeWallGap(boardCoord, false)) {
 				boardLocations[boardCoord.getX()][boardCoord.getWall("north")
@@ -791,16 +879,31 @@ public class GameView implements ViewPanel {
 			break;
 		}
 	}
-
+	
+	/**
+	 * A method for translating wallGapLocation coordinate into the relevant boardLocations coordinate
+	 * View Grid to Model Grid
+	 * @param coord - the coordinate being converted
+	 * @return the translated coordinate
+	 */
 	public Coordinate convertVGtoMG(Coordinate coord) {
 		return new Coordinate((coord.getX() * 2) + 1, (coord.getY() * 2) + 1);
 	}
 
+	/**
+	 * The method activated when a board location square is clicked
+	 * @param e - the mouse event that triggered the method
+	 */
 	public void squareClicked(MouseEvent e) {
 		Coordinate squareCoord = getSquareCoordinates(e);
 		movePlayer(squareCoord);
 	}
 
+	/**
+	 * Moves the players pawn to the coordinate location
+	 * @param squareCoord - the coordinate location the pawn is being moved to
+	 * @return a boolean stating if the wall move was successfull or not
+	 */
 	public boolean movePlayer(Coordinate squareCoord) {
 		switch (currentState.toString()) {
 		case "MovingPlayer":
@@ -826,6 +929,10 @@ public class GameView implements ViewPanel {
 		return false;
 	}
 
+	/**
+	 * Checks if the end game conditions have been met
+	 * @return - a boolean stating if the game has finished or not
+	 */
 	public boolean checkEndGame() {
 		if (quoridor.checkFinish(quoridor.getPlayersTurn(), quoridor
 				.getPlayers()[quoridor.getPlayersTurn()].getPawnLocation()) == true) {
@@ -836,12 +943,17 @@ public class GameView implements ViewPanel {
 		return false;
 	}
 
+	/**
+	 * Updates all the relevant GUI visuals relating to the gameplay
+	 */
 	public void updateBoardDisplay() {
+		//Updates labels
 		playersTurnLabel.setText(messages.getString("players_turn")
 				+ (quoridor.getPlayersTurn() + 1));
 		playerWallsLabel.setText(messages.getString("players_walls")
 				+ (quoridor.getPlayersWallsLeft()));
 		Player[] players = quoridor.getPlayers();
+		//updates all the boardLocations 
 		for (int x = 0; x < 17; x++) {
 			for (int y = 0; y < 17; y++) {
 				if (quoridor.checkFreeSquare(new Coordinate(x, y))) {
@@ -856,6 +968,7 @@ public class GameView implements ViewPanel {
 				}
 			}
 		}
+		//updates all the players pawns
 		int i = 0;
 		for (Player player : players) {
 			if (player.getPawnLocation() != null) {
@@ -875,7 +988,7 @@ public class GameView implements ViewPanel {
 										squareWinIMG, getPlayersImage(i))));
 					}
 				}
-
+				//updates the walsl placed on the board
 				for (Wall wall : player.getWallsPlaced()) {
 					if (wall.isHorizontal() == true) {
 						boardLocations[wall.getPosition().getWall("west")
@@ -898,6 +1011,10 @@ public class GameView implements ViewPanel {
 		}
 	}
 
+	/**
+	 * Checks if the current players pawn location is in a finishing square
+	 * @param coord - the coordinate of the pawn
+	 */
 	public boolean checkWinLocation(Coordinate coord) {
 		ArrayList<ArrayList<Coordinate>> allWinLocations = getWinLocations();
 		ArrayList<Coordinate> winLocations;
@@ -910,10 +1027,15 @@ public class GameView implements ViewPanel {
 		return false;
 	}
 
+	/**
+	 * Generates the winning square locations for the current game type and for every player
+	 * @return a list of all the win locations for each player
+	 */
 	public ArrayList<ArrayList<Coordinate>> getWinLocations() {
 		ArrayList<ArrayList<Coordinate>> allCoords = new ArrayList<ArrayList<Coordinate>>();
 		for (int i = 0; i < quoridor.getRules().MAX_PLAYERS; i++) {
 			allCoords.add(new ArrayList<Coordinate>());
+			//fetches the normal mode finish square locations
 			if (quoridor.getRules().getGameRules() == messages
 					.getString("normal_rules")) {
 				switch (i) {
@@ -938,6 +1060,7 @@ public class GameView implements ViewPanel {
 					}
 					break;
 				}
+			//fetches the challenge mode finish square locations
 			} else {
 				switch (i) {
 				case 0:
@@ -958,6 +1081,10 @@ public class GameView implements ViewPanel {
 		return allCoords;
 	}
 
+	/**
+	 * Overlays image2 on top of image1
+	 * @return the new overlayed image
+	 */
 	public Image overlayImage(Image image1, Image image2) {
 		BufferedImage combined = new BufferedImage(62, 62,
 				BufferedImage.TYPE_INT_ARGB);
@@ -968,12 +1095,18 @@ public class GameView implements ViewPanel {
 		return combined;
 	}
 
+	/**
+	 * fetches the players image being used by the selected player
+	 * @param player - the player selected
+	 * @return the image associated with the players colour
+	 */
 	public Image getPlayersImage(int player) {
 		String playerColour = quoridor.getPlayers()[player].getPawn().getColour();
 		String redColour = messages.getString("colour_red");
 		String blueColour = messages.getString("colour_blue");
 		String greenColour = messages.getString("colour_green");
 		String yellowColour = messages.getString("colour_yellow");
+		//selects the player image of the selected player colour
 		if (playerColour.equals(redColour)) {
 			return redPawnIMG;
 		} else if (playerColour.equals(blueColour)) {
@@ -986,12 +1119,19 @@ public class GameView implements ViewPanel {
 		return null;
 	}
 	
+	/**
+	 * fetches the players wall image being used by the selected player
+	 * @param player - the player selected
+	 * @param isHorizontal - the boolean stating if the wall is horizontal or vertical
+	 * @return the wall image associated with the players colour
+	 */
 	public Image getPlayersWallImage(int player, boolean isHorizontal) {
 		String playerColour = quoridor.getPlayers()[player].getPawn().getColour();
 		String redColour = messages.getString("colour_red");
 		String blueColour = messages.getString("colour_blue");
 		String greenColour = messages.getString("colour_green");
 		String yellowColour = messages.getString("colour_yellow");
+		//selects the player image of the selected player colour depending on the orientation of the wall
 		if (isHorizontal){
 			if (playerColour.equals(redColour)) {
 				return redHWallIMG;

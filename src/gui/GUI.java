@@ -74,6 +74,7 @@ public class GUI {
 		// Initialise the Main Menu class
 		MainMenuView menu = new MainMenuView();
 		
+		//initialises the music images
 		try {
 			muteIMG = ImageIO.read(new File("Images/music/mute.png"));
 			quietIMG = ImageIO.read(new File("Images/music/quiet.png"));
@@ -91,6 +92,8 @@ public class GUI {
 				BufferedImage.TYPE_INT_ARGB);
 		loudIMG = loudIMG.getScaledInstance(30, 30,
 				BufferedImage.TYPE_INT_ARGB);
+				
+		//creates the panel for music settings
 		JPanel musicPanel;
 		musicPanel = new JPanel(null);
 		musicPanel.setLocation(10, 10);
@@ -108,6 +111,7 @@ public class GUI {
 		});
 		musicPanel.add(muteLabel);
 		
+		//starts the music
 		try {
 			loadMusic();
 		} catch (UnsupportedAudioFileException | IOException
@@ -125,6 +129,9 @@ public class GUI {
 		frame.setVisible(true);
 	}
 	
+	/**
+	 * Loads the music from the file and starts it
+	 */
 	public void loadMusic() throws UnsupportedAudioFileException, IOException, LineUnavailableException{
         AudioInputStream audioStream = AudioSystem.getAudioInputStream(new File("music/musics.wav"));
         AudioFormat format = audioStream.getFormat();
@@ -137,12 +144,17 @@ public class GUI {
         changeVolume();
 	}
 	
+	/**
+	 * Changes the current volume of the music to the next setting
+	 */
 	public void changeVolume(){
 		volume -= 10;
+		// keeps the volume within the range 5 & -35
 		if (volume == -35){
 			volume = 5;
 		}
 		gainControl.setValue(volume);
+		//changes to the next setting
 		switch (volume) {
 		case -25:
 			muteLabel.setIcon(new ImageIcon(muteIMG));

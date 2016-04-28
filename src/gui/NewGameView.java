@@ -157,9 +157,14 @@ public class NewGameView implements ViewPanel {
 		});
 	}
 
+	/**
+	 * generates the player settings panel depending on the player amound selected
+	 */
 	public void updatePlayerInputs(){
+		//clears the panel
 		playerDetailsPanel.removeAll();
 		playerDetailsPanel.revalidate();
+		//creates the components
 		playerLabels = new JLabel[]{new JLabel(messages.getString("player_1")), new JLabel(messages.getString("player_2")), new JLabel(messages.getString("player_3")), new JLabel(messages.getString("player_4"))};
 		playerTypes = new JComboBox[]{new JComboBox(playerTypeStrings), new JComboBox(playerTypeStrings), new JComboBox(playerTypeStrings), new JComboBox(playerTypeStrings)};
 		playerColours = new JComboBox[]{new JComboBox(playerColourStrings), new JComboBox(playerColourStrings), new JComboBox(playerColourStrings), new JComboBox(playerColourStrings)};
@@ -168,19 +173,22 @@ public class NewGameView implements ViewPanel {
 		playerColours[2].setSelectedIndex(2);
 		playerColours[3].setSelectedIndex(3);
 		playerNames = new JTextField[]{new JTextField(20), new JTextField(20), new JTextField(20), new JTextField(20)};
-
+		
+		//sets the sizes of the components
 		for (int i = 0; i < 4; i++) {
 			playerLabels[i].setSize(40, 20);
 			playerTypes[i].setSize(40, 20);
 			playerColours[i].setSize(40, 20);
 			playerNames[i].setSize(40, 20);
 		}
-
+		
+		//attaches the headings
 		playerDetailsPanel.add(new JLabel(""));
 		playerDetailsPanel.add(new JLabel(messages.getString("player")));
 		playerDetailsPanel.add(new JLabel(messages.getString("colour")));
 		playerDetailsPanel.add(new JLabel(messages.getString("name")));
 
+		//creates the inputs depending on the player count
 		switch(gameMode.getSelectedItem().toString().substring(0, 1)){
 		case "2":
 			wallRules.setSelectedIndex(1);
@@ -236,9 +244,16 @@ public class NewGameView implements ViewPanel {
 		getJPanel().updateUI();
 	}
 
+	/**
+	 * Makes sure that only one player may select one colour 
+	 * @param e - the combo box selection which triggered this method
+	 */
 	public void updatePlayerColourInputs(ItemEvent e){
+		//method runs twice for an item select, then twice more when the player colours are updated
+		//this makes sure it only picks up on the first two method runs
 		active++;
 		if (active < 3){
+			//gets the players number whos changing colour and the colour they had it as before
 			if (e.getStateChange() == ItemEvent.DESELECTED){
 				for (int i = 0; i < 4; i++) {
 					if (playerColours[i] == (JComboBox) e.getSource()){
@@ -251,6 +266,7 @@ public class NewGameView implements ViewPanel {
 						}
 					}
 				}
+			//updates the player with the matching colour to have the other players colour
 			} else if (e.getStateChange() == ItemEvent.SELECTED){
 				for (int i = 0; i < 4; i++) {
 					if (e.getItem().toString().equals(playerColours[i].getSelectedItem().toString()) &&
@@ -261,11 +277,16 @@ public class NewGameView implements ViewPanel {
 				}
 			}
 		}
+		//allows method to be triggered correcly again
 		if (active == 4){
 			active = 0;
 		}
 	}
 
+	/**
+	 * generates the players name depending on if they are a human or computer player
+	 * @param e - the combo box event which triggered this method
+	 */
 	public void generateBotName(ItemEvent e){
 		if (e.getStateChange() == ItemEvent.SELECTED){
 			int playerID = -1;
@@ -285,6 +306,10 @@ public class NewGameView implements ViewPanel {
 		}
 	}
 
+	/**
+	 * generates a set of rules based on the selected inputs for the new game
+	 * @return the rules generated
+	 */
 	public Rules setupRules(){
 		Rules theRules = null;
 		int playerCount = 0;
@@ -293,6 +318,7 @@ public class NewGameView implements ViewPanel {
 		String[] names = null;
 		ArrayList<String> botIDs = new ArrayList<String>();
 		switch(gameMode.getSelectedItem().toString().substring(0, 1)){
+		//for a 2 player game
 		case "2":
 			playerCount = 2;
 			colours = new String[]{playerColours[0].getSelectedItem().toString(), playerColours[1].getSelectedItem().toString()};
@@ -303,6 +329,7 @@ public class NewGameView implements ViewPanel {
 				}
 			}
 			break;
+		//for a 4 player game
 		case "4":
 			playerCount = 4;
 			colours = new String[]{playerColours[0].getSelectedItem().toString(), playerColours[1].getSelectedItem().toString(), playerColours[2].getSelectedItem().toString(), playerColours[3].getSelectedItem().toString()};
@@ -314,6 +341,7 @@ public class NewGameView implements ViewPanel {
 			}
 			break;
 		}
+		// determines the wall counts for the game
 		switch(wallRules.getSelectedItem().toString().substring(0, 2)){
 		case "5 ": wallCount = 5;break;
 		case "10": wallCount = 10;break;
