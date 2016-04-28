@@ -8,6 +8,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
+import java.awt.Color;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
@@ -90,6 +91,10 @@ public class KeyBindingsView implements ViewPanel {
 		JPanel controlPanel = new JPanel();
 		panel = new JPanel();
 
+		panel.setBackground(new Color(99, 187, 214));
+		buttonPanel.setOpaque(false);
+		controlPanel.setOpaque(false);
+		
 		// Specify LayoutManagers
 		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
 		GridLayout controlLayout = new GridLayout(0, 2);

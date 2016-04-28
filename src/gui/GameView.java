@@ -218,6 +218,10 @@ public class GameView implements ViewPanel {
 		boardPanel = new JPanel(null);
 		panel = new JPanel(null);
 
+		panel.setBackground(new Color(99, 187, 214));
+		boardPanel.setOpaque(false);
+		sideButtons.setOpaque(false);
+		
 		// Specify LayoutManagers
 		boardPanel.setSize(600, 600);
 		boardPanel.setLocation(220, 5);

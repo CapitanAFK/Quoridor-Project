@@ -6,7 +6,6 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Locale;
 import java.util.ResourceBundle;
 
 import javax.imageio.ImageIO;
@@ -19,8 +18,8 @@ import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
+import javax.swing.UIManager.LookAndFeelInfo;
 
-import sun.applet.Main;
 
 /**
  * This class creates a GUI which allows the user to interact with the game.
@@ -46,6 +45,17 @@ public class GUI {
 	 * It initialises a JFrame and an object of class MainMenuView is passed to it
 	 */
 	public GUI(){	
+		try {
+		    for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+		        if ("Nimbus".equals(info.getName())) {
+		            UIManager.setLookAndFeel(info.getClassName());
+		            break;
+		        }
+		    }
+		} catch (Exception e) {
+		    // If Nimbus is not available, you can set the GUI to another look and feel.
+		}
+		
 		// Set the current language
 		currentLanguage = new Language();
 		ResourceBundle messages = currentLanguage.getMessages();
@@ -85,6 +95,7 @@ public class GUI {
 		musicPanel = new JPanel(null);
 		musicPanel.setLocation(10, 10);
 		musicPanel.setSize(30, 30);
+		musicPanel.setOpaque(false);
 		muteLabel = new JLabel();
 		muteLabel.setLocation(0, 0);
 		muteLabel.setSize(30, 30);

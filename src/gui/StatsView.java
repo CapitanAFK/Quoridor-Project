@@ -55,10 +55,14 @@ public class StatsView implements ViewPanel {
 		panel = new JPanel();
 		JPanel statsPanel = new JPanel();
 		JPanel buttonPanel = new JPanel();
+		
+		panel.setBackground(new Color(99, 187, 214));
+		statsPanel.setOpaque(false);
+		buttonPanel.setOpaque(false);
 
 		JTable table = getTable();
 		JScrollPane scrollPane = new JScrollPane(table);
-		scrollPane.setBorder(new EmptyBorder(0,30,0,30));
+		scrollPane.setBorder(new EmptyBorder(0,30,200,30));
 		
 		// Specify LayoutManagers
 		panel.setLayout(new BorderLayout());

@@ -39,6 +39,7 @@ public class MainMenuView implements ViewPanel {
 		JButton optionsButton = new JButton();
 		JButton exitButton = new JButton();
 		JButton highScoreButton = new JButton();
+		JButton rulesButton = new JButton();
 
 		// Set the properties of the components	
 		newGameButton.setText(messages.getString("new_game"));
@@ -46,6 +47,12 @@ public class MainMenuView implements ViewPanel {
 		newGameButton.setMinimumSize(new Dimension(75, 50));
 		newGameButton.setPreferredSize(new Dimension(75, 50));
 		newGameButton.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
+		
+		rulesButton.setText(messages.getString("how_to_play"));
+		rulesButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+		rulesButton.setMinimumSize(new Dimension(75, 50));
+		rulesButton.setPreferredSize(new Dimension(75, 50));
+		rulesButton.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
 		
 		highScoreButton.setText(messages.getString("high_score"));
 		highScoreButton.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -67,7 +74,9 @@ public class MainMenuView implements ViewPanel {
 		
 		// Create containers to hold the components
 		panel = new JPanel();
+		panel.setBackground(new Color(99, 187, 214));
 		JPanel buttonPanel = new JPanel();
+		buttonPanel.setOpaque(false);
 		
 		//Specify LayoutManagers
 		panel.setLayout(new BorderLayout());
@@ -77,6 +86,7 @@ public class MainMenuView implements ViewPanel {
 		
 		// Add components to containers
 		buttonPanel.add(newGameButton);
+		buttonPanel.add(rulesButton);
 		buttonPanel.add(optionsButton);
 		buttonPanel.add(highScoreButton);
 		buttonPanel.add(exitButton);
@@ -115,6 +125,15 @@ public class MainMenuView implements ViewPanel {
 				HighScoreView hsv = new HighScoreView();
 				hsv.addToJFrame();
 				hsv.setVisible();
+			}
+		});
+		
+		rulesButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				panel.setVisible(false);
+				HowToPlay htp = new HowToPlay();
+				htp.addToJFrame();
+				htp.setVisible();
 			}
 		});
 	}

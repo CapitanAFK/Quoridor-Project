@@ -111,6 +111,10 @@ public class NewGameView implements ViewPanel {
 		playerDetailsPanel.setSize(400, 100);
 		playerDetailsPanel.setLocation(200, 240);		
 
+		panel.setBackground(new Color(99, 187, 214));
+		newGamePanel.setOpaque(false);
+		playerDetailsPanel.setOpaque(false);
+		
 		// Add components to containers
 		newGamePanel.add(gameModeLabel);
 		newGamePanel.add(gameMode);

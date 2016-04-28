@@ -67,6 +67,10 @@ public class OptionsView implements ViewPanel {
 		panel = new JPanel();
 		JPanel twoWidePanel = new JPanel();
 		
+		panel.setBackground(new Color(99, 187, 214));
+		optionsPanel.setOpaque(false);
+		twoWidePanel.setOpaque(false);
+
 		// Specify LayoutManagers
 		optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
 		panel.setLayout(new BorderLayout());
